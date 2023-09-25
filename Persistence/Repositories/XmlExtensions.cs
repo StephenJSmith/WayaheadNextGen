@@ -56,6 +56,9 @@ public static class XmlExtensions {
   public static bool ToBoolean(this XAttribute attribute) {
     if (attribute == null) return false;
 
-    return attribute.Value.ToUpper() == "Y";
+    var trueValues = new string[] {"y", "yes", "true"};
+    var result = trueValues.Any(x => x == attribute.Value.ToLower());
+
+    return result;
   }
 }

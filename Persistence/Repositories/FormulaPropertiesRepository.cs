@@ -92,6 +92,7 @@ public class FormulaPropertiesRepository
         PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
         ReferenceNo = el.Attribute(ReferenceNoXml).Value
       })
+      .OrderBy(o => o.Number)
       .ToList();
 
     return result;
@@ -116,6 +117,7 @@ public class FormulaPropertiesRepository
        PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
        ReferenceNo = el.Attribute(ReferenceNoXml).Value
      })
+     .OrderBy(ph => ph.HierarchicalNumber)
      .ToList();
 
     return result;
@@ -142,6 +144,7 @@ public class FormulaPropertiesRepository
         PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
         ReferenceNo = el.Attribute(ReferenceNoXml).Value
       })
+      .OrderBy(st => st.HierarchicalNumber)
       .ToList();
 
     return result;
@@ -163,6 +166,7 @@ public class FormulaPropertiesRepository
         PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
         ReferenceNo = el.Attribute(ReferenceNoXml).Value
       })
+      .OrderBy(sub => sub.HierarchicalNumber)
       .ToList();
 
     return result;
@@ -177,7 +181,7 @@ public class FormulaPropertiesRepository
         .Where(el => el.Attribute(NumberXml).Value == sub.HierarchicalNumber)
         .ToList();
 
-        Debug.WriteLine("SubStep: " + sub.HierarchicalNumber);
+      Debug.WriteLine("SubStep: " + sub.HierarchicalNumber);
 
       var properties = subStepXml
         .Descendants("Property")
@@ -188,35 +192,53 @@ public class FormulaPropertiesRepository
           Description2 = el.Attribute(Description2Xml).Value,
           CopyCommand = el.Attribute(CopyCommandXml).Value,
           Hint = el.Attribute("Hint").Value,
-            AutoCalculation = el.Attribute("AutoCalculation").Value,
-            Validation = el.Attribute("Validation").Value,
-            SecurityLevel = el.Attribute(SecurityLevelXml).Value,
-            ESignCommentsRequired = el.Attribute("ESignCommentsRequired").ToBoolean(),
-            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-            ReferenceNo = el.Attribute(ReferenceNoXml).Value,
-            CheckCompletion = el.Attribute("CheckCompletion").ToBoolean(),
-            CompletionErrorMessage = el.Attribute("CompletionErrorMessage").Value,
-            PostDeletionScript = el.Attribute("PostDeletionScript").Value,
-            EditorType = el.Attribute("EditorType").Value.ToEditorType(),
-            DefaultValue = el.Attribute("DefaultValue").Value,
-            Uom = el.Attribute("UOM").Value,
-            RunProgram1 = el.Attribute("RunProgram1").Value,
-            RunProgram2 = el.Attribute("RunProgram2").Value,
-            IFramePosition = el.Attribute("IframePosition").Value.ToIFramePosition(),
-            ChildReport = el.Attribute("ChildReport").Value,
-            FullSize = el.Attribute("FullSize").ToBoolean(),
-            PictureEvidence = el.Attribute("PictureEvidence").ToBoolean(),
-            Disable = el.Attribute("Disable").ToBoolean(),
-            Hide = el.Attribute("Hide").ToBoolean(),
-            Nullable = el.Attribute("Nullable").ToBoolean(),
-            ReportType = el.Attribute("ReportType").Value.ToReportType(),
+          AutoCalculation = el.Attribute("AutoCalculation").Value,
+          Validation = el.Attribute("Validation").Value,
+          SecurityLevel = el.Attribute(SecurityLevelXml).Value,
+          ESignCommentsRequired = el.Attribute("ESignCommentsRequired").ToBoolean(),
+          PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
+          PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
+          ReferenceNo = el.Attribute(ReferenceNoXml).Value,
+          CheckCompletion = el.Attribute("CheckCompletion").ToBoolean(),
+          CompletionErrorMessage = el.Attribute("CompletionErrorMessage").Value,
+          PostDeletionScript = el.Attribute("PostDeletionScript").Value,
+          EditorType = el.Attribute("EditorType").Value.ToEditorType(),
+          DefaultValue = el.Attribute("DefaultValue").Value,
+          Uom = el.Attribute("UOM").Value,
+          RunProgram1 = el.Attribute("RunProgram1").Value,
+          RunProgram2 = el.Attribute("RunProgram2").Value,
+          IFramePosition = el.Attribute("IframePosition").Value.ToIFramePosition(),
+          ChildReport = el.Attribute("ChildReport").Value,
+          FullSize = el.Attribute("FullSize").ToBoolean(),
+          PictureEvidence = el.Attribute("PictureEvidence").ToBoolean(),
+          Disable = el.Attribute("Disable").ToBoolean(),
+          Hide = el.Attribute("Hide").ToBoolean(),
+          Nullable = el.Attribute("Nullable").ToBoolean(),
+          ReportType = el.Attribute("ReportType").Value.ToReportType(),
 
-            RichEditorRows = el.Attribute("Data-RichEditor_Rows").ToInt(),
-            RichEditorFontSize = el.Attribute("Data-RichEditor_FontSize").ToInt(),
-            ReviewESignatureESignReasons = el.Attribute("Data-ReviewESignature_ESignReasons")?.ToString(),
-            DispensingShowBatchItemOnly = el.Attribute("Data-Dispensing_ShowBatchItemOnly").ToBoolean(),
-
+          // Optional properties per EditorType, ReportType, RunProgramX,..
+          Data_RichEditor_Rows = el.Attribute("Data-RichEditor_Rows").ToInt(),
+          Data_RichEditor_FontSize = el.Attribute("Data-RichEditor_FontSize").ToInt(),
+          Data_ReviewESignature_ESignReasons = el.Attribute("Data-ReviewESignature_ESignReasons")?.Value,
+          Data_Dispensing_ShowBatchItemOnly = el.Attribute("Data-Dispensing_ShowBatchItemOnly").ToBoolean(),
+          Data_Dispensing_Url = el.Attribute("Data-Dispensing_Url")?.Value,
+          Data_Dashboard_Url = el.Attribute("Data-Dashboard_Url")?.Value,
+          Data_Dashboard_Name = el.Attribute("Data-Dashboard_Name")?.Value,
+          Data_Dropdown_KeyValues = el.Attribute("Data-Dropdown_KeyValues")?.Value,
+          Data_YesNo_LimitSelections = el.Attribute("Data-YesNo_LimitSelections").ToBoolean(),
+          Data_EquipmentIssuing_CheckStartupEquipmentsOnly = el.Attribute("Data-EquipmentIssuing_CheckStartupEquipmentsOnly").ToBoolean(),
+          Data_EquipmentIssuing_Url = el.Attribute("Data-EquipmentIssuing_Url")?.Value,
+          Data_Mfg_Url = el.Attribute("Data-Mfg_Url")?.Value,
+          Data_Timespan_TimeRange = el.Attribute("Data-Timespan_TimeRange")?.Value,
+          Data_Timespan_StartEndTimeProperty = el.Attribute("Data-Timespan_StartEndTimeProperty")?.Value,
+          Data_Timespan_TimeSpanFormat = el.Attribute("Data-Timespan_TimeSpanFormat")?.Value,
+          Data_Nested_ReportStyle = el.Attribute("Data-Nested_ReportStyle")?.Value,
+          Data_Nested_ReportFontSize = el.Attribute("Data-Nested_ReportFontSize").ToInt(),
+          Data_Nested_ReportHideCreatedBy = el.Attribute("Data-Nested_ReportHideCreatedBy").ToBoolean(),
+          Data_Nested_ReportHideESignatureBy = el.Attribute("Data-Nested_ReportHideESignatureBy").ToBoolean(),
+          Data_Nested_ReportHideIsDeleted = el.Attribute("Data-Nested_ReportHideIsDeleted").ToBoolean(),
+          Data_ManualIPC_Url = el.Attribute("Data-ManualIPC_Url")?.Value,
+          Data_MesEvent_Url = el.Attribute("Data-MesEvent_Url")?.Value,
         })
         .ToList();
 

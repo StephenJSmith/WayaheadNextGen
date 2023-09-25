@@ -32,9 +32,29 @@ public class MesProperty {
   public bool Hide { get; set; }
   public bool Nullable { get; set; }
   public MesReportType ReportType { get; set; }
-  public int RichEditorRows { get; set; }
-  public int RichEditorFontSize { get; set; }
-  public string ReviewESignatureESignReasons { get; set; }
-  public bool DispensingShowBatchItemOnly { get; set; }
-  public string DispensingUrl { get; set; }
+
+  // Optional fields per EditorType, RunProgramX, ReportType, ...
+  public int Data_RichEditor_Rows { get; set; }
+  public int Data_RichEditor_FontSize { get; set; }
+  public string Data_ReviewESignature_ESignReasons { get; set; }
+  public bool Data_Dispensing_ShowBatchItemOnly { get; set; }
+  public string Data_Dispensing_Url { get; set; }
+  public string Data_Dashboard_Url { get; set; }
+  public string Data_Dashboard_Name { get; set; }
+  public string Data_DashboardMes_View { get; set; }
+  public string Data_Dropdown_KeyValues { get; set; }
+  public bool Data_YesNo_LimitSelections { get; set; }
+  public bool Data_EquipmentIssuing_CheckStartupEquipmentsOnly { get; set; }
+  public string Data_EquipmentIssuing_Url { get; set; }
+  public string Data_Mfg_Url { get; set; }
+  public string Data_Timespan_TimeRange { get; set; }
+  public string Data_Timespan_StartEndTimeProperty { get; set; }
+  public string Data_Timespan_TimeSpanFormat { get; set; }
+  public string Data_Nested_ReportStyle { get; set; }
+  public int Data_Nested_ReportFontSize { get; set; }
+  public bool Data_Nested_ReportHideCreatedBy { get; set; }
+  public bool Data_Nested_ReportHideESignatureBy { get; set; }
+  public bool Data_Nested_ReportHideIsDeleted { get; set; }
+  public string Data_ManualIPC_Url { get; set; }
+  public string Data_MesEvent_Url { get; set; }
 }
