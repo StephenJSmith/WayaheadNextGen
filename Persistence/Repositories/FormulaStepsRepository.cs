@@ -1,12 +1,11 @@
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.Linq;
 using Domain.Entities;
 
 namespace Persistence.Repositories;
 
-public class FormulaPropertiesRepository
+public class FormulaStepsRepository
 {
   private const string FormulaXml = "Formula";
   private const string OperationXml = "Operation";
@@ -224,6 +223,7 @@ public class FormulaPropertiesRepository
           Data_Dispensing_Url = el.Attribute("Data-Dispensing_Url")?.Value,
           Data_Dashboard_Url = el.Attribute("Data-Dashboard_Url")?.Value,
           Data_Dashboard_Name = el.Attribute("Data-Dashboard_Name")?.Value,
+          Data_Dashboard_MesView = el.Attribute("Data-Dashboard_MesView")?.Value,
           Data_Dropdown_KeyValues = el.Attribute("Data-Dropdown_KeyValues")?.Value,
           Data_YesNo_LimitSelections = el.Attribute("Data-YesNo_LimitSelections").ToBoolean(),
           Data_EquipmentIssuing_CheckStartupEquipmentsOnly = el.Attribute("Data-EquipmentIssuing_CheckStartupEquipmentsOnly").ToBoolean(),

@@ -41,7 +41,7 @@ public class MesProperty {
   public string Data_Dispensing_Url { get; set; }
   public string Data_Dashboard_Url { get; set; }
   public string Data_Dashboard_Name { get; set; }
-  public string Data_DashboardMes_View { get; set; }
+  public string Data_Dashboard_MesView { get; set; }
   public string Data_Dropdown_KeyValues { get; set; }
   public bool Data_YesNo_LimitSelections { get; set; }
   public bool Data_EquipmentIssuing_CheckStartupEquipmentsOnly { get; set; }
