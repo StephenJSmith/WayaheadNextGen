@@ -10,6 +10,7 @@ public class MesFormula
     public string Description2 { get; set; }
     public string CopyCommand { get; set; }
     public List<MesOperation> Operations { get; set; }
+    public List<MesNestedEditorType> NestedEditorTypes { get; set; }
     public DateTime SavedOn { get; set; }
     public string SavedBy { get; set; }
 }

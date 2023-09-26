@@ -4,16 +4,28 @@ using Domain.Enums;
 namespace Persistence.Repositories;
 
 public static class XmlExtensions {
-  public static bool IsYN(this string value) {
-    if (string.IsNullOrWhiteSpace(value)) return false;
 
-    return value.ToUpper() == "Y";
+  public static string ToStringValue(this XAttribute attribute) {
+    if (attribute == null) return string.Empty;
+
+    return attribute.Value ?? string.Empty;
   }
 
-  public static int FromHierarchicalNumber(this string value) {
-    if (string.IsNullOrWhiteSpace(value)) return 0;
+  public static DateTime ToDateTime(this XAttribute attribute) {
+    if (attribute == null) return DateTime.MinValue;
 
-    var elements = value.Trim().Split(".");
+    if (!DateTime.TryParse(attribute.Value, out DateTime parsedDateTime)) {
+      return DateTime.MinValue;
+    }
+
+    return parsedDateTime;
+  }
+
+  public static int FromHierarchicalNumber(this XAttribute attribute) {
+    if (attribute == null 
+      || string.IsNullOrWhiteSpace(attribute.Value)) return 0;
+
+    var elements = attribute.Value.Trim().Split(".");
     if (!elements.Any()) return 0;
 
     var lastValue = elements[elements.Length - 1];
