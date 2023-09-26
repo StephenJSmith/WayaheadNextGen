@@ -10,7 +10,8 @@ public class MesProperty {
   public string Hint { get; set; }
   public string AutoCalculation { get; set; }
   public string Validation { get; set; }
-  public string SecurityLevel { get; set; }
+  public string ValueRange { get; set; }
+  public SecurityLevel SecurityLevel { get; set; }
 
   public bool ESignCommentsRequired { get; set; }
 	public string PreRenderScript { get; set; }
@@ -21,6 +22,7 @@ public class MesProperty {
   public string PostDeletionScript { get; set; }
   public MesEditorType EditorType { get; set; }
   public string DefaultValue { get; set; }
+  public bool Pivot { get; set; }
   public string Uom { get; set; }
   public string RunProgram1 { get; set; }
   public string RunProgram2 { get; set; }
@@ -31,7 +33,9 @@ public class MesProperty {
   public bool Disable { get; set; }
   public bool Hide { get; set; }
   public bool Nullable { get; set; }
-  public MesReportType ReportType { get; set; }
+  public MesReportType? ReportType { get; set; }
+	public MesFormulaEditKeys ParentEditKeys { get; set; }
+  public Dictionary<string, string> Data { get; set; } = new Dictionary<string, string>();
 
   // Optional fields per EditorType, RunProgramX, ReportType, ...
   public int Data_RichEditor_Rows { get; set; }

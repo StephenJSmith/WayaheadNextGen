@@ -2,6 +2,7 @@ namespace Domain.Entities;
 
 public class MesPhase {
   public int Number { get; set; }
+	public int OperationNumber { get; set; }
 	public string HierarchicalNumber { get; set; }
 	public string Name { get; set; }
 	public string Description1 { get; set; }

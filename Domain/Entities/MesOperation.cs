@@ -2,6 +2,7 @@ namespace Domain.Entities;
 
 public class MesOperation {
 	public int Number { get; set; }
+	public MesFormulaEditKeys ParentEditKeys { get; set; }
 	public string Name { get; set; }
 	public string Description1 { get; set; }
 	public string Description2 { get; set; }
