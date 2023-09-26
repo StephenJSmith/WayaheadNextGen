@@ -132,4 +132,28 @@ public static class XmlExtensions
 
     return result;
   }
+
+  public static Dictionary<string, string> ToDataDictionary(this XElement element) {
+    if (element == null) return new Dictionary<string, string>();
+
+    const string DataPrefix = "Data-";
+    var startIndex = DataPrefix.Length;
+
+    var dataDictionary = new Dictionary<string, string>();
+
+    var dataAttributes = element
+      .Attributes()
+      .Where(at => at.Name.ToString().StartsWith(DataPrefix))
+      .ToList();
+
+    dataAttributes.ForEach(at =>
+    {
+      var key = at.Name.ToString().Substring(startIndex);
+      var value = at.Value;
+
+      dataDictionary.Add(key, value);
+    });
+
+    return dataDictionary;
+  }
 }
