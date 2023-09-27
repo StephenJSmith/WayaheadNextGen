@@ -27,24 +27,23 @@ public class FormulaStepsRepository
   private const string ReferenceNoXml = "ReferenceNo";
   private const string SecurityLevelXml = "SecurityLevel";
 
-  public MesFormula GetFormulaStepsWithEventSubStep(
+    #region GetFormulaStepsWithEventSubStep()
+
+    public MesFormula GetFormulaStepsWithEventSubStep(
     string formulaPathFile, string formulaName, int edition, int revision)
   {
     if (!Path.Exists(formulaPathFile)) throw new FileNotFoundException();
 
     try
     {
-      var xElement = XElement.Load(formulaPathFile);
-      var parentEditKey = new MesFormulaEditKeys
-      {
-        Formula = formulaName,
-        Edition = edition,
-        Revision = revision
-      };
+        var xElement = XElement.Load(formulaPathFile);
 
-      var mesFormula = GetFormula(xElement, formulaName, edition, revision);
-      mesFormula.Operations = GetOperations(xElement, parentEditKey);
-      mesFormula.NestedEditorTypes = GetNestedEditorTypes(xElement);
+        var mesFormula = GetFormula(xElement, formulaName, edition, revision);
+        var loadProgress = new LoadProgress(formulaName, edition, revision);
+        mesFormula.Operations = GetOperations(xElement, loadProgress);
+
+        var nestedLoadProgress = new LoadProgress(formulaName, edition, revision, true);
+        mesFormula.NestedEditorTypes = GetNestedEditorTypes(xElement, nestedLoadProgress);
 
       return mesFormula;
     }
@@ -54,12 +53,180 @@ public class FormulaStepsRepository
     }
   }
 
-  private List<MesOperation> GetOperations(XElement xElement, MesFormulaEditKeys parentEditKey)
+    private List<MesOperation> GetOperations(XElement xElement, LoadProgress loadProgress)
   {
-    return new List<MesOperation>();
+    var mesOperations = new List<MesOperation>();
+    loadProgress.InitialiseOperationNumber();
+
+    foreach (var operationXEl in xElement.Descendants(OperationXml))
+    {
+      var mesOperation = GetOperation(operationXEl, loadProgress);
+      mesOperations.Add(mesOperation);
+      loadProgress.IncrementOperationNumber();
+    }
+
+    return mesOperations;
   }
 
-  public MesFormula GetFormulaSteps(string formulaPathFile,
+    private MesOperation GetOperation(XElement operationXEl, 
+      LoadProgress loadProgress)
+    {
+        var operation = GetOperation(operationXEl);
+        operation.Number = loadProgress.OperationNumber;
+        operation.ParentEditKeys = loadProgress.GetOperationParentEditKeys();
+
+        loadProgress.SetOperationDescriptions(operation);
+        operation.Phases = GetPhases(operationXEl, loadProgress);
+
+       return operation; 
+    }
+
+    private List<MesPhase> GetPhases(XElement operationXEl,
+      LoadProgress loadProgress)
+    {
+      var mesPhases = new List<MesPhase>();
+      loadProgress.InitialisePhaseNumber();
+
+      foreach (var phaseXEl in operationXEl.Descendants(PhaseXml))
+      {
+        var phase = GetPhase(phaseXEl, loadProgress);
+        mesPhases.Add(phase);
+        loadProgress.IncrementPhaseNumber();
+      }
+
+      return mesPhases;
+    }
+
+    private MesPhase GetPhase(XElement phaseXEl,
+        LoadProgress loadProgress)
+    {
+        var phase = GetPhase(phaseXEl);
+        phase.Number = loadProgress.PhaseNumber;
+        phase.OperationNumber = loadProgress.OperationNumber;
+        phase.HierarchicalNumber = loadProgress.HieararchicalPhaseNumber;
+        phase.ParentEditKeys = loadProgress.GetPhaseParentEditKeys();
+        
+        loadProgress.SetPhaseDescriptions(phase);
+        phase.Steps = GetSteps(phaseXEl, loadProgress);
+
+        return phase;
+    }
+
+    private List<MesStep> GetSteps(XElement phaseXEl, LoadProgress loadProgress)
+    {
+        var mesSteps = new List<MesStep>();
+        loadProgress.InitialiseStepNumber();
+
+        foreach (var stepXEl in phaseXEl.Descendants(StepXml))
+        {
+            var step = GetStep(stepXEl, loadProgress);
+            mesSteps.Add(step);
+            loadProgress.IncrementStepNumber();
+        }
+
+        return mesSteps;
+    }
+
+    private MesStep GetStep(XElement stepXEl, LoadProgress loadProgress)
+    {
+        var step = GetStep(stepXEl);
+        step.Number = loadProgress.StepNumber;
+        step.OperationNumber = loadProgress.OperationNumber;
+        step.PhaseNumber = loadProgress.PhaseNumber;
+        step.HierarchicalNumber = loadProgress.HierarchicalStepNumber;
+        step.ParentEditKeys = loadProgress.GetStepParentEditKeys();
+        
+        loadProgress.SetStepAncestorDescriptions(step);
+
+        step.SubSteps = GetSubSteps(stepXEl, loadProgress);
+
+        return step;
+    }
+
+    private List<MesSubStep> GetSubSteps(XElement stepXEl, LoadProgress loadProgress)
+    {
+        var mesSubSteps = new List<MesSubStep>();
+        loadProgress.InitialiseSubStepNumber();
+
+        foreach (var subStepXEl in stepXEl.Descendants(SubStepXml))
+        {
+            var subStep = GetSubStep(subStepXEl, loadProgress);
+            mesSubSteps.Add(subStep);
+            loadProgress.IncrementSubStepNumber();
+        }
+
+        return mesSubSteps;
+    }
+
+    private MesSubStep GetSubStep(XElement subStepXEl, LoadProgress loadProgress)
+    {
+        var subStep = GetSubStep(subStepXEl);
+        subStep.Number = loadProgress.SubStepNumber;
+        subStep.HierarchicalNumber = loadProgress.HierarchicalStepNumber;
+        subStep.ParentEditKeys = loadProgress.GetSubStepParentEditKeys();
+
+        subStep.Properties = GetProperties(subStepXEl, loadProgress);
+
+        return subStep;
+    }
+
+    private List<MesProperty> GetProperties(XElement subStepXEl, LoadProgress loadProgress)
+    {
+        var mesProperties = new List<MesProperty>();
+        loadProgress.InitialisePropertyNumber();
+
+        foreach (var propertyXEl in subStepXEl.Descendants(PropertyXml))
+        {
+            var property = GetProperty(propertyXEl, loadProgress);
+            mesProperties.Add(property);
+            loadProgress.IncrementPropertyNumber();
+        }
+
+        return mesProperties;
+    }
+
+    private MesProperty GetProperty(XElement propertyXEl, LoadProgress loadProgress)
+    {
+        var property = GetProperty(propertyXEl);
+        property.PropertyNumber = loadProgress.PropertyNumber;
+        property.ParentEditKeys = loadProgress.GetPropertyParentEditKeys();
+
+        return property;
+    }
+
+    private List<MesNestedEditorType> GetNestedEditorTypes(XElement xElement, LoadProgress loadProgress)
+    {
+        var mesNestedEditorTypes = new List<MesNestedEditorType>();
+        loadProgress.InitialiseNestedEditorTypeNumber();
+
+        foreach (var xelNested in xElement.Descendants(NestedEditorTypeXml))
+        {
+            var nestedEditorType = GetNestedEditorType(xelNested, loadProgress);
+            mesNestedEditorTypes.Add(nestedEditorType);
+            loadProgress.IncrementNestedEditorTypeNumber();
+        }
+
+        return mesNestedEditorTypes;
+    }
+
+    private MesNestedEditorType GetNestedEditorType(XElement xelNested, LoadProgress loadProgress)
+    {
+        var nestedType = GetNestedEditorType(xelNested);
+        nestedType.Number = loadProgress.NestedEditorTypeNumber;
+        nestedType.ParentEditKeys = loadProgress.GetFormulaEditKeys();
+        loadProgress.SetNestedEditorTypeName(nestedType.Name);
+
+        nestedType.Properties = GetProperties(xelNested, loadProgress);
+
+        return nestedType;
+    }
+
+    #endregion
+
+    #region GetFormulaSteps
+
+
+    public MesFormula GetFormulaSteps(string formulaPathFile,
     string formulaName, int edition, int revision)
   {
     if (!Path.Exists(formulaPathFile)) throw new FileNotFoundException();
@@ -124,121 +291,146 @@ public class FormulaStepsRepository
   }
 
   private List<MesOperation> GetOperations(XElement xElement)
-  {
-    var result = xElement
-      .Descendants(OperationXml)
-      .Select(el => new MesOperation
-      {
-        Number = el.Attribute(NumberXml).ToInt(),
-        Name = el.Attribute(NameXml).Value,
-        Description1 = el.Attribute(Description1Xml).Value,
-        Description2 = el.Attribute(Description2Xml).Value,
-        CopyCommand = el.Attribute(CopyCommandXml).Value,
-        MenuDescription = el.Attribute(MenuDescriptionXml).Value,
-        NextOperationAllowed = el.Attribute("NextOperationAllowed").Value,
-        DisableFlowControl = el.Attribute(DisableFlowControlXml).ToBoolean(),
-        EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
-        PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-        PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-        ReferenceNo = el.Attribute(ReferenceNoXml).Value
-      })
-      .OrderBy(o => o.Number)
-      .ToList();
+    {
+        var result = xElement
+          .Descendants(OperationXml)
+          .Select(el => GetOperation(el))
+          .OrderBy(o => o.Number)
+          .ToList();
 
-    return result;
-  }
+        return result;
+    }
 
-  private List<MesPhase> GetPhases(XElement xElement)
-  {
-    var result = xElement
-     .Descendants(PhaseXml)
-     .Select(el => new MesPhase
-     {
-       HierarchicalNumber = el.Attribute(NumberXml).Value,
-       Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
-       Description1 = el.Attribute(Description1Xml).Value,
-       Description2 = el.Attribute(Description2Xml).Value,
-       CopyCommand = el.Attribute(CopyCommandXml).Value,
-       MenuDescription = el.Attribute(MenuDescriptionXml).Value,
-       NextPhaseAllowed = el.Attribute("NextPhaseAllowed").Value,
-       DisableFlowControl = el.Attribute(DisableFlowControlXml).ToBoolean(),
-       EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
-       PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-       PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-       ReferenceNo = el.Attribute(ReferenceNoXml).Value
-     })
-     .OrderBy(ph => ph.HierarchicalNumber)
-     .ToList();
+    private static MesOperation GetOperation(XElement el)
+    {
+        return new MesOperation
+        {
+            Number = el.Attribute(NumberXml).ToInt(),
+            Name = el.Attribute(NameXml).Value,
+            Description1 = el.Attribute(Description1Xml).Value,
+            Description2 = el.Attribute(Description2Xml).Value,
+            CopyCommand = el.Attribute(CopyCommandXml).Value,
+            MenuDescription = el.Attribute(MenuDescriptionXml).Value,
+            NextOperationAllowed = el.Attribute("NextOperationAllowed").Value,
+            DisableFlowControl = el.Attribute(DisableFlowControlXml).ToBoolean(),
+            EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
+            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
+            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+        };
+    }
 
-    return result;
-  }
+    private List<MesPhase> GetPhases(XElement xElement)
+    {
+        var result = xElement
+         .Descendants(PhaseXml)
+         .Select(el => GetPhase(el))
+         .OrderBy(ph => ph.HierarchicalNumber)
+         .ToList();
 
-  private List<MesStep> GetSteps(XElement xElement)
-  {
-    var result = xElement
-      .Descendants(StepXml)
-      .Select(el => new MesStep
-      {
-        HierarchicalNumber = el.Attribute(NumberXml).Value,
-        Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
-        Name = el.Attribute(NameXml).Value,
-        Description1 = el.Attribute(Description1Xml).Value,
-        Description2 = el.Attribute(Description2Xml).Value,
-        CopyCommand = el.Attribute(CopyCommandXml).Value,
-        MenuDescription = el.Attribute(MenuDescriptionXml).Value,
-        NextStepAllowed = el.Attribute("NextStepAllowed").Value,
-        EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
-        AlwaysEnableNewRun = el.Attribute("AlwaysEnableNewRun").ToBoolean(),
-        SecurityLevel = el.Attribute(SecurityLevelXml).ToSecurityLevel(),
-        PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-        PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-        ReferenceNo = el.Attribute(ReferenceNoXml).Value
-      })
-      .OrderBy(st => st.HierarchicalNumber)
-      .ToList();
+        return result;
+    }
 
-    return result;
-  }
+    private static MesPhase GetPhase(XElement el)
+    {
+        return new MesPhase
+        {
+            HierarchicalNumber = el.Attribute(NumberXml).Value,
+            Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
+            Description1 = el.Attribute(Description1Xml).Value,
+            Description2 = el.Attribute(Description2Xml).Value,
+            CopyCommand = el.Attribute(CopyCommandXml).Value,
+            MenuDescription = el.Attribute(MenuDescriptionXml).Value,
+            NextPhaseAllowed = el.Attribute("NextPhaseAllowed").Value,
+            DisableFlowControl = el.Attribute(DisableFlowControlXml).ToBoolean(),
+            EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
+            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
+            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+        };
+    }
 
-  private List<MesSubStep> GetSubSteps(XElement xElement)
-  {
-    var result = xElement
-      .Descendants(SubStepXml)
-      .Select(el => new MesSubStep
-      {
-        HierarchicalNumber = el.Attribute(NumberXml).Value,
-        Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
-        Name = el.Attribute(NameXml).Value,
-        Description1 = el.Attribute(Description1Xml).Value,
-        Description2 = el.Attribute(Description2Xml).Value,
-        CopyCommand = el.Attribute(CopyCommandXml).Value,
-        PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-        PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-        ReferenceNo = el.Attribute(ReferenceNoXml).Value
-      })
-      .OrderBy(sub => sub.HierarchicalNumber)
-      .ToList();
+    private List<MesStep> GetSteps(XElement xElement)
+    {
+        var result = xElement
+          .Descendants(StepXml)
+          .Select(el => GetStep(el))
+          .OrderBy(st => st.HierarchicalNumber)
+          .ToList();
 
-    return result;
-  }
+        return result;
+    }
 
-  private List<MesNestedEditorType> GetNestedEditorTypes(XElement xElement)
-  {
-    var nestedEditorTypes = xElement
-      .Descendants(NestedEditorTypeXml)
-      .Select(el => new MesNestedEditorType
-      {
-        Name = el.Attribute(NameXml).ToStringValue(),
-        Description1 = el.Attribute(Description1Xml).ToStringValue(),
-        Description2 = el.Attribute(Description2Xml).ToStringValue(),
-        Properties = GetProperties(el)
-      })
-      .ToList();
+    private static MesStep GetStep(XElement el)
+    {
+        return new MesStep
+        {
+            HierarchicalNumber = el.Attribute(NumberXml).Value,
+            Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
+            Name = el.Attribute(NameXml).Value,
+            Description1 = el.Attribute(Description1Xml).Value,
+            Description2 = el.Attribute(Description2Xml).Value,
+            CopyCommand = el.Attribute(CopyCommandXml).Value,
+            MenuDescription = el.Attribute(MenuDescriptionXml).Value,
+            NextStepAllowed = el.Attribute("NextStepAllowed").Value,
+            EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
+            AlwaysEnableNewRun = el.Attribute("AlwaysEnableNewRun").ToBoolean(),
+            SecurityLevel = el.Attribute(SecurityLevelXml).ToSecurityLevel(),
+            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
+            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+        };
+    }
 
-    return nestedEditorTypes;
-  }
+    private List<MesSubStep> GetSubSteps(XElement xElement)
+    {
+        var result = xElement
+          .Descendants(SubStepXml)
+          .Select(el => GetSubStep(el))
+          .OrderBy(sub => sub.HierarchicalNumber)
+          .ToList();
 
-  private void ApplySubStepProperties(XElement xElement, List<MesSubStep> mesSubSteps)
+        return result;
+    }
+
+    private static MesSubStep GetSubStep(XElement el)
+    {
+        return new MesSubStep
+        {
+            HierarchicalNumber = el.Attribute(NumberXml).Value,
+            Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
+            Name = el.Attribute(NameXml).Value,
+            Description1 = el.Attribute(Description1Xml).Value,
+            Description2 = el.Attribute(Description2Xml).Value,
+            CopyCommand = el.Attribute(CopyCommandXml).Value,
+            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
+            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+        };
+    }
+
+    private List<MesNestedEditorType> GetNestedEditorTypes(XElement xElement)
+    {
+        var nestedEditorTypes = xElement
+          .Descendants(NestedEditorTypeXml)
+          .Select(el => GetNestedEditorType(el))
+          .ToList();
+
+        return nestedEditorTypes;
+    }
+
+    private static MesNestedEditorType GetNestedEditorType(XElement el)
+    {
+        return new MesNestedEditorType
+        {
+            Name = el.Attribute(NameXml).ToStringValue(),
+            Description1 = el.Attribute(Description1Xml).ToStringValue(),
+            Description2 = el.Attribute(Description2Xml).ToStringValue(),
+            Properties = GetProperties(el)
+        };
+    }
+
+    private void ApplySubStepProperties(XElement xElement, List<MesSubStep> mesSubSteps)
   {
     mesSubSteps.ForEach(sub =>
     {
@@ -253,72 +445,77 @@ public class FormulaStepsRepository
   }
 
   private static List<MesProperty> GetProperties(XElement parentElement)
-  {
-    var properties = parentElement
-      .Descendants(PropertyXml)
-      .Select(el => new MesProperty
-      {
-        Name = el.Attribute(NameXml).Value,
-        Description1 = el.Attribute(Description1Xml).Value,
-        Description2 = el.Attribute(Description2Xml).Value,
-        CopyCommand = el.Attribute(CopyCommandXml).Value,
-        Hint = el.Attribute("Hint").Value,
-        AutoCalculation = el.Attribute("AutoCalculation").Value,
-        Validation = el.Attribute("Validation").Value,
-        SecurityLevel = el.Attribute(SecurityLevelXml).ToSecurityLevel(),
-        ESignCommentsRequired = el.Attribute("ESignCommentsRequired").ToBoolean(),
-        PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-        PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-        ReferenceNo = el.Attribute(ReferenceNoXml).Value,
-        CheckCompletion = el.Attribute("CheckCompletion").ToBoolean(),
-        CompletionErrorMessage = el.Attribute("CompletionErrorMessage").Value,
-        PostDeletionScript = el.Attribute("PostDeletionScript").Value,
-        EditorType = el.Attribute("EditorType").ToEditorType(),
-        DefaultValue = el.Attribute("DefaultValue").Value,
-        Uom = el.Attribute("UOM").Value,
-        RunProgram1 = el.Attribute("RunProgram1").Value,
-        RunProgram2 = el.Attribute("RunProgram2").Value,
-        IFramePosition = el.Attribute("IframePosition").ToIFramePosition(),
-        ChildReport = el.Attribute("ChildReport").Value,
-        FullSize = el.Attribute("FullSize").ToBoolean(),
-        PictureEvidence = el.Attribute("PictureEvidence").ToBoolean(),
-        Disable = el.Attribute("Disable").ToBoolean(),
-        Hide = el.Attribute("Hide").ToBoolean(),
-        Nullable = el.Attribute("Nullable").ToBoolean(),
-        ReportType = el.Attribute("ReportType").ToReportType(),
-        Data = el.ToDataDictionary(),
+    {
+        var properties = parentElement
+          .Descendants(PropertyXml)
+          .Select(el => GetProperty(el))
+          .ToList();
 
-        // Optional properties per EditorType, ReportType, RunProgramX,..
-        Data_RichEditor_Rows = el.Attribute("Data-RichEditor_Rows").ToInt(),
-        Data_RichEditor_FontSize = el.Attribute("Data-RichEditor_FontSize").ToInt(),
-        Data_ReviewESignature_ESignReasons = el.Attribute("Data-ReviewESignature_ESignReasons")?.Value,
-        Data_Dispensing_ShowBatchItemOnly = el.Attribute("Data-Dispensing_ShowBatchItemOnly").ToBoolean(),
-        Data_Dispensing_Url = el.Attribute("Data-Dispensing_Url")?.Value,
-        Data_Dashboard_Url = el.Attribute("Data-Dashboard_Url")?.Value,
-        Data_Dashboard_Name = el.Attribute("Data-Dashboard_Name")?.Value,
-        Data_Dashboard_MesView = el.Attribute("Data-Dashboard_MesView")?.Value,
-        Data_Dropdown_KeyValues = el.Attribute("Data-Dropdown_KeyValues")?.Value,
-        Data_YesNo_LimitSelections = el.Attribute("Data-YesNo_LimitSelections").ToBoolean(),
-        Data_EquipmentIssuing_CheckStartupEquipmentsOnly = el.Attribute("Data-EquipmentIssuing_CheckStartupEquipmentsOnly").ToBoolean(),
-        Data_EquipmentIssuing_Url = el.Attribute("Data-EquipmentIssuing_Url")?.Value,
-        Data_Mfg_Url = el.Attribute("Data-Mfg_Url")?.Value,
-        Data_Timespan_TimeRange = el.Attribute("Data-Timespan_TimeRange")?.Value,
-        Data_Timespan_StartEndTimeProperty = el.Attribute("Data-Timespan_StartEndTimeProperty")?.Value,
-        Data_Timespan_TimeSpanFormat = el.Attribute("Data-Timespan_TimeSpanFormat")?.Value,
-        Data_Nested_ReportStyle = el.Attribute("Data-Nested_ReportStyle")?.Value,
-        Data_Nested_ReportFontSize = el.Attribute("Data-Nested_ReportFontSize").ToInt(),
-        Data_Nested_ReportHideCreatedBy = el.Attribute("Data-Nested_ReportHideCreatedBy").ToBoolean(),
-        Data_Nested_ReportHideESignatureBy = el.Attribute("Data-Nested_ReportHideESignatureBy").ToBoolean(),
-        Data_Nested_ReportHideIsDeleted = el.Attribute("Data-Nested_ReportHideIsDeleted").ToBoolean(),
-        Data_ManualIPC_Url = el.Attribute("Data-ManualIPC_Url")?.Value,
-        Data_MesEvent_Url = el.Attribute("Data-MesEvent_Url")?.Value,
-      })
-      .ToList();
+        return properties;
+    }
 
-    return properties;
-  }
+    private static MesProperty GetProperty(XElement el)
+    {
+        return new MesProperty
+        {
+            Name = el.Attribute(NameXml).Value,
+            Description1 = el.Attribute(Description1Xml).Value,
+            Description2 = el.Attribute(Description2Xml).Value,
+            CopyCommand = el.Attribute(CopyCommandXml).Value,
+            Hint = el.Attribute("Hint").Value,
+            AutoCalculation = el.Attribute("AutoCalculation").Value,
+            Validation = el.Attribute("Validation").Value,
+            SecurityLevel = el.Attribute(SecurityLevelXml).ToSecurityLevel(),
+            ESignCommentsRequired = el.Attribute("ESignCommentsRequired").ToBoolean(),
+            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
+            ReferenceNo = el.Attribute(ReferenceNoXml).Value,
+            CheckCompletion = el.Attribute("CheckCompletion").ToBoolean(),
+            CompletionErrorMessage = el.Attribute("CompletionErrorMessage").Value,
+            PostDeletionScript = el.Attribute("PostDeletionScript").Value,
+            EditorType = el.Attribute("EditorType").ToEditorType(),
+            DefaultValue = el.Attribute("DefaultValue").Value,
+            Uom = el.Attribute("UOM").Value,
+            RunProgram1 = el.Attribute("RunProgram1").Value,
+            RunProgram2 = el.Attribute("RunProgram2").Value,
+            IFramePosition = el.Attribute("IframePosition").ToIFramePosition(),
+            ChildReport = el.Attribute("ChildReport").Value,
+            FullSize = el.Attribute("FullSize").ToBoolean(),
+            PictureEvidence = el.Attribute("PictureEvidence").ToBoolean(),
+            Disable = el.Attribute("Disable").ToBoolean(),
+            Hide = el.Attribute("Hide").ToBoolean(),
+            Nullable = el.Attribute("Nullable").ToBoolean(),
+            ReportType = el.Attribute("ReportType").ToReportType(),
+            Data = el.ToDataDictionary(),
 
-  private List<MesOperation> GetHierarchicalElements(
+            // Optional properties per EditorType, ReportType, RunProgramX,..
+            Data_RichEditor_Rows = el.Attribute("Data-RichEditor_Rows").ToInt(),
+            Data_RichEditor_FontSize = el.Attribute("Data-RichEditor_FontSize").ToInt(),
+            Data_ReviewESignature_ESignReasons = el.Attribute("Data-ReviewESignature_ESignReasons")?.Value,
+            Data_Dispensing_ShowBatchItemOnly = el.Attribute("Data-Dispensing_ShowBatchItemOnly").ToBoolean(),
+            Data_Dispensing_Url = el.Attribute("Data-Dispensing_Url")?.Value,
+            Data_Dashboard_Url = el.Attribute("Data-Dashboard_Url")?.Value,
+            Data_Dashboard_Name = el.Attribute("Data-Dashboard_Name")?.Value,
+            Data_Dashboard_MesView = el.Attribute("Data-Dashboard_MesView")?.Value,
+            Data_Dropdown_KeyValues = el.Attribute("Data-Dropdown_KeyValues")?.Value,
+            Data_YesNo_LimitSelections = el.Attribute("Data-YesNo_LimitSelections").ToBoolean(),
+            Data_EquipmentIssuing_CheckStartupEquipmentsOnly = el.Attribute("Data-EquipmentIssuing_CheckStartupEquipmentsOnly").ToBoolean(),
+            Data_EquipmentIssuing_Url = el.Attribute("Data-EquipmentIssuing_Url")?.Value,
+            Data_Mfg_Url = el.Attribute("Data-Mfg_Url")?.Value,
+            Data_Timespan_TimeRange = el.Attribute("Data-Timespan_TimeRange")?.Value,
+            Data_Timespan_StartEndTimeProperty = el.Attribute("Data-Timespan_StartEndTimeProperty")?.Value,
+            Data_Timespan_TimeSpanFormat = el.Attribute("Data-Timespan_TimeSpanFormat")?.Value,
+            Data_Nested_ReportStyle = el.Attribute("Data-Nested_ReportStyle")?.Value,
+            Data_Nested_ReportFontSize = el.Attribute("Data-Nested_ReportFontSize").ToInt(),
+            Data_Nested_ReportHideCreatedBy = el.Attribute("Data-Nested_ReportHideCreatedBy").ToBoolean(),
+            Data_Nested_ReportHideESignatureBy = el.Attribute("Data-Nested_ReportHideESignatureBy").ToBoolean(),
+            Data_Nested_ReportHideIsDeleted = el.Attribute("Data-Nested_ReportHideIsDeleted").ToBoolean(),
+            Data_ManualIPC_Url = el.Attribute("Data-ManualIPC_Url")?.Value,
+            Data_MesEvent_Url = el.Attribute("Data-MesEvent_Url")?.Value,
+        };
+    }
+
+    private List<MesOperation> GetHierarchicalElements(
   List<MesOperation> mesOperations,
   List<MesPhase> mesPhases,
   List<MesStep> mesSteps,
@@ -342,4 +539,6 @@ public class FormulaStepsRepository
 
     return mesOperations;
   }
+
+    #endregion
 }

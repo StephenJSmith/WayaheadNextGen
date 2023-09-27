@@ -4,6 +4,7 @@ namespace Domain.Entities;
 
 public class MesProperty {
 	public string Name { get; set; }
+	public int PropertyNumber { get; set; }
 	public string Description1 { get; set; }
 	public string Description2 { get; set; }
 	public string CopyCommand { get; set; }
