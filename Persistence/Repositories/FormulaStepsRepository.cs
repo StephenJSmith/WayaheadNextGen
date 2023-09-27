@@ -1,6 +1,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Persistence.Repositories;
 
@@ -10,6 +11,7 @@ public class FormulaStepsRepository
   private const string OperationXml = "Operation";
   private const string PropertyXml = "Property";
   private const string NestedEditorTypeXml = "NestedEditorType";
+  private const string NestedEditorNameXml = "NestedEditorName";
   private const string PhaseXml = "Phase";
   private const string StepXml = "Step";
   private const string SubStepXml = "SubStep";
@@ -145,7 +147,10 @@ public class FormulaStepsRepository
 
     private List<MesSubStep> GetSubSteps(XElement stepXEl, LoadProgress loadProgress)
     {
-        var mesSubSteps = new List<MesSubStep>();
+        var mesSubSteps = new List<MesSubStep>
+        {
+            GetEventSubStep(loadProgress)
+        };
         loadProgress.InitialiseSubStepNumber();
 
         foreach (var subStepXEl in stepXEl.Descendants(SubStepXml))
@@ -156,6 +161,43 @@ public class FormulaStepsRepository
         }
 
         return mesSubSteps;
+    }
+
+    private MesSubStep GetEventSubStep(LoadProgress loadProgress)
+    {
+        var mesSubStep = new MesSubStep
+        {
+            Number = loadProgress.EventSubStepNumber,
+            HierarchicalNumber = loadProgress.HierarchicalEventSubStepNumber,
+            Description1 = "Event entry - Please enter any Events / Deviations / Comments in the table below.",
+            ParentEditKeys = loadProgress.GetSubStepParentEditKeys(),
+            Properties = new List<MesProperty>
+            {
+                new MesProperty
+                {
+                    PropertyNumber = loadProgress.EventPropertyNumber,
+                    Name = loadProgress.EventPropertyName,
+                    SecurityLevel = SecurityLevel.Disabled,
+                    CheckCompletion = true,
+                    CompletionErrorMessage = "Please select YES to indicate that all entries have been added to table.",
+                    EditorType = MesEditorType.YesNo,
+                    DefaultValue = "Yes",
+                    IFrameUrl = "/MesAuxiliary/MesEvent/",
+                    IFramePosition = MesIFramePosition.After,
+                    ChildReport = "MesEventReport.frx",
+                    FullSize = true,
+                    PictureEvidence = false,
+                    Disable = false,
+                    Hide = true,
+                    Nullable = false,
+                    ReportType = MesReportType.StandardAndChildReport,
+                    ReportCsvStyle = 0,
+                    Data_Nested_ReportFontSize = 0
+                }
+            }
+        };
+
+        return mesSubStep;
     }
 
     private MesSubStep GetSubStep(XElement subStepXEl, LoadProgress loadProgress)
@@ -303,20 +345,21 @@ public class FormulaStepsRepository
 
     private static MesOperation GetOperation(XElement el)
     {
+        // TODO: Commented out code is for NEW version of MES
         return new MesOperation
         {
             Number = el.Attribute(NumberXml).ToInt(),
-            Name = el.Attribute(NameXml).Value,
-            Description1 = el.Attribute(Description1Xml).Value,
-            Description2 = el.Attribute(Description2Xml).Value,
-            CopyCommand = el.Attribute(CopyCommandXml).Value,
-            MenuDescription = el.Attribute(MenuDescriptionXml).Value,
-            NextOperationAllowed = el.Attribute("NextOperationAllowed").Value,
+            Name= el.Attribute(NameXml).ToStringValue(),
+            Description1 = el.Attribute(Description1Xml).ToStringValue(),
+            Description2 = el.Attribute(Description2Xml).ToStringValue(),
+            CopyCommand = el.Attribute(CopyCommandXml).ToStringValue(),
+            MenuDescription = el.Attribute(MenuDescriptionXml).ToStringValue(),
+            NextOperationAllowed = el.Attribute("NextOperationAllowed").ToStringValue(),
             DisableFlowControl = el.Attribute(DisableFlowControlXml).ToBoolean(),
             EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
-            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+            PreRenderScript = el.Attribute(PreRenderScriptXml).ToStringValue(),
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).ToStringValue(),
+            ReferenceNo = el.Attribute(ReferenceNoXml).ToStringValue()
         };
     }
 
@@ -335,18 +378,18 @@ public class FormulaStepsRepository
     {
         return new MesPhase
         {
-            HierarchicalNumber = el.Attribute(NumberXml).Value,
+            HierarchicalNumber = el.Attribute(NumberXml).ToStringValue(),
             Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
-            Description1 = el.Attribute(Description1Xml).Value,
-            Description2 = el.Attribute(Description2Xml).Value,
-            CopyCommand = el.Attribute(CopyCommandXml).Value,
-            MenuDescription = el.Attribute(MenuDescriptionXml).Value,
-            NextPhaseAllowed = el.Attribute("NextPhaseAllowed").Value,
+            Description1 = el.Attribute(Description1Xml).ToStringValue(),
+            Description2 = el.Attribute(Description2Xml).ToStringValue(),
+            CopyCommand = el.Attribute(CopyCommandXml).ToStringValue(),
+            MenuDescription = el.Attribute(MenuDescriptionXml).ToStringValue(),
+            NextPhaseAllowed = el.Attribute("NextPhaseAllowed").ToStringValue(),
             DisableFlowControl = el.Attribute(DisableFlowControlXml).ToBoolean(),
             EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
-            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+            PreRenderScript = el.Attribute(PreRenderScriptXml).ToStringValue(),
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).ToStringValue(),
+            ReferenceNo = el.Attribute(ReferenceNoXml).ToStringValue()
         };
     }
 
@@ -365,20 +408,20 @@ public class FormulaStepsRepository
     {
         return new MesStep
         {
-            HierarchicalNumber = el.Attribute(NumberXml).Value,
+            HierarchicalNumber = el.Attribute(NumberXml).ToStringValue(),
             Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
-            Name = el.Attribute(NameXml).Value,
-            Description1 = el.Attribute(Description1Xml).Value,
-            Description2 = el.Attribute(Description2Xml).Value,
-            CopyCommand = el.Attribute(CopyCommandXml).Value,
-            MenuDescription = el.Attribute(MenuDescriptionXml).Value,
-            NextStepAllowed = el.Attribute("NextStepAllowed").Value,
+            //Name = el.Attribute(NameXml).ToStringValue(),
+            Description1 = el.Attribute(Description1Xml).ToStringValue(),
+            Description2 = el.Attribute(Description2Xml).ToStringValue(),
+            CopyCommand = el.Attribute(CopyCommandXml).ToStringValue(),
+            MenuDescription = el.Attribute(MenuDescriptionXml).ToStringValue(),
+            NextStepAllowed = el.Attribute("NextStepAllowed").ToStringValue(),
             EnableMultiRun = el.Attribute(EnableMultiRunXml).ToBoolean(),
             AlwaysEnableNewRun = el.Attribute("AlwaysEnableNewRun").ToBoolean(),
             SecurityLevel = el.Attribute(SecurityLevelXml).ToSecurityLevel(),
-            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+            PreRenderScript = el.Attribute(PreRenderScriptXml).ToStringValue(),
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).ToStringValue(),
+            ReferenceNo = el.Attribute(ReferenceNoXml).ToStringValue()
         };
     }
 
@@ -397,15 +440,15 @@ public class FormulaStepsRepository
     {
         return new MesSubStep
         {
-            HierarchicalNumber = el.Attribute(NumberXml).Value,
+            HierarchicalNumber = el.Attribute(NumberXml).ToStringValue(),
             Number = el.Attribute(NumberXml).FromHierarchicalNumber(),
-            Name = el.Attribute(NameXml).Value,
-            Description1 = el.Attribute(Description1Xml).Value,
-            Description2 = el.Attribute(Description2Xml).Value,
-            CopyCommand = el.Attribute(CopyCommandXml).Value,
-            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-            ReferenceNo = el.Attribute(ReferenceNoXml).Value
+            Name = el.Attribute(NameXml).ToStringValue(),
+            Description1 = el.Attribute(Description1Xml).ToStringValue(),
+            Description2 = el.Attribute(Description2Xml).ToStringValue(),
+            CopyCommand = el.Attribute(CopyCommandXml).ToStringValue(),
+            PreRenderScript = el.Attribute(PreRenderScriptXml).ToStringValue(),
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).ToStringValue(),
+            ReferenceNo = el.Attribute(ReferenceNoXml).ToStringValue()
         };
     }
 
@@ -458,60 +501,66 @@ public class FormulaStepsRepository
     {
         return new MesProperty
         {
-            Name = el.Attribute(NameXml).Value,
-            Description1 = el.Attribute(Description1Xml).Value,
-            Description2 = el.Attribute(Description2Xml).Value,
-            CopyCommand = el.Attribute(CopyCommandXml).Value,
-            Hint = el.Attribute("Hint").Value,
-            AutoCalculation = el.Attribute("AutoCalculation").Value,
-            Validation = el.Attribute("Validation").Value,
+            Name = el.Attribute(NameXml).ToStringValue(),
+            Description1 = el.Attribute(Description1Xml).ToStringValue(),
+            Description2 = el.Attribute(Description2Xml).ToStringValue(),
+            CopyCommand = el.Attribute(CopyCommandXml).ToStringValue(),
+            Hint = el.Attribute("Hint").ToStringValue(),
+            AutoCalculation = el.Attribute("AutoCalculation").ToStringValue(),
+            Validation = el.Attribute("Validation").ToStringValue(),
             SecurityLevel = el.Attribute(SecurityLevelXml).ToSecurityLevel(),
-            ESignCommentsRequired = el.Attribute("ESignCommentsRequired").ToBoolean(),
-            PreRenderScript = el.Attribute(PreRenderScriptXml).Value,
-            PostExecutionScript = el.Attribute(PostExecutionScriptXml).Value,
-            ReferenceNo = el.Attribute(ReferenceNoXml).Value,
+            PreRenderScript = el.Attribute(PreRenderScriptXml).ToStringValue(),
+            PostExecutionScript = el.Attribute(PostExecutionScriptXml).ToStringValue(),
+            ReferenceNo = el.Attribute(ReferenceNoXml).ToStringValue(),
             CheckCompletion = el.Attribute("CheckCompletion").ToBoolean(),
-            CompletionErrorMessage = el.Attribute("CompletionErrorMessage").Value,
-            PostDeletionScript = el.Attribute("PostDeletionScript").Value,
+            CompletionErrorMessage = el.Attribute("CompletionErrorMessage").ToStringValue(),
+            PostDeletionScript = el.Attribute("PostDeletionScript").ToStringValue(),
             EditorType = el.Attribute("EditorType").ToEditorType(),
-            DefaultValue = el.Attribute("DefaultValue").Value,
-            Uom = el.Attribute("UOM").Value,
-            RunProgram1 = el.Attribute("RunProgram1").Value,
-            RunProgram2 = el.Attribute("RunProgram2").Value,
+            DefaultValue = el.Attribute("DefaultValue").ToStringValue(),
+            Uom = el.Attribute("UOM").ToStringValue(),
+            RunProgram1 = el.Attribute("RunProgram1").ToStringValue(),
+            RunProgram2 = el.Attribute("RunProgram2").ToStringValue(),
             IFramePosition = el.Attribute("IframePosition").ToIFramePosition(),
-            ChildReport = el.Attribute("ChildReport").Value,
+            ChildReport = el.Attribute("ChildReport").ToStringValue(),
             FullSize = el.Attribute("FullSize").ToBoolean(),
             PictureEvidence = el.Attribute("PictureEvidence").ToBoolean(),
             Disable = el.Attribute("Disable").ToBoolean(),
             Hide = el.Attribute("Hide").ToBoolean(),
             Nullable = el.Attribute("Nullable").ToBoolean(),
             ReportType = el.Attribute("ReportType").ToReportType(),
+            NestedEditorName = el.Attribute(NestedEditorNameXml).ToStringValue(),
+            RepeatMinTimes = el.Attribute("RepeatMinTimes").ToInt(),
+            RepeatMaxTimes = el.Attribute("RepeatMaxTimes").ToInt(),
+            RepeatInterval = el.Attribute("RepeatInterval").ToTimeSpan(),
+            ReportCsvStyle = el.Attribute("ReportCsvStyle").ToReportCsvStyle(),
+            ReportCsvFontSize = el.Attribute("ReportCsvFontSize").ToInt(),
+
             Data = el.ToDataDictionary(),
 
             // Optional properties per EditorType, ReportType, RunProgramX,..
             Data_RichEditor_Rows = el.Attribute("Data-RichEditor_Rows").ToInt(),
             Data_RichEditor_FontSize = el.Attribute("Data-RichEditor_FontSize").ToInt(),
-            Data_ReviewESignature_ESignReasons = el.Attribute("Data-ReviewESignature_ESignReasons")?.Value,
+            Data_ReviewESignature_ESignReasons = el.Attribute("Data-ReviewESignature_ESignReasons")?.ToStringValue(),
             Data_Dispensing_ShowBatchItemOnly = el.Attribute("Data-Dispensing_ShowBatchItemOnly").ToBoolean(),
-            Data_Dispensing_Url = el.Attribute("Data-Dispensing_Url")?.Value,
-            Data_Dashboard_Url = el.Attribute("Data-Dashboard_Url")?.Value,
-            Data_Dashboard_Name = el.Attribute("Data-Dashboard_Name")?.Value,
-            Data_Dashboard_MesView = el.Attribute("Data-Dashboard_MesView")?.Value,
-            Data_Dropdown_KeyValues = el.Attribute("Data-Dropdown_KeyValues")?.Value,
+            Data_Dispensing_Url = el.Attribute("Data-Dispensing_Url")?.ToStringValue(),
+            Data_Dashboard_Url = el.Attribute("Data-Dashboard_Url")?.ToStringValue(),
+            Data_Dashboard_Name = el.Attribute("Data-Dashboard_Name")?.ToStringValue(),
+            Data_Dashboard_MesView = el.Attribute("Data-Dashboard_MesView")?.ToStringValue(),
+            Data_Dropdown_KeyValues = el.Attribute("Data-Dropdown_KeyValues")?.ToStringValue(),
             Data_YesNo_LimitSelections = el.Attribute("Data-YesNo_LimitSelections").ToBoolean(),
             Data_EquipmentIssuing_CheckStartupEquipmentsOnly = el.Attribute("Data-EquipmentIssuing_CheckStartupEquipmentsOnly").ToBoolean(),
-            Data_EquipmentIssuing_Url = el.Attribute("Data-EquipmentIssuing_Url")?.Value,
-            Data_Mfg_Url = el.Attribute("Data-Mfg_Url")?.Value,
-            Data_Timespan_TimeRange = el.Attribute("Data-Timespan_TimeRange")?.Value,
-            Data_Timespan_StartEndTimeProperty = el.Attribute("Data-Timespan_StartEndTimeProperty")?.Value,
-            Data_Timespan_TimeSpanFormat = el.Attribute("Data-Timespan_TimeSpanFormat")?.Value,
-            Data_Nested_ReportStyle = el.Attribute("Data-Nested_ReportStyle")?.Value,
+            Data_EquipmentIssuing_Url = el.Attribute("Data-EquipmentIssuing_Url")?.ToStringValue(),
+            Data_Mfg_Url = el.Attribute("Data-Mfg_Url")?.ToStringValue(),
+            Data_Timespan_TimeRange = el.Attribute("Data-Timespan_TimeRange")?.ToStringValue(),
+            Data_Timespan_StartEndTimeProperty = el.Attribute("Data-Timespan_StartEndTimeProperty")?.ToStringValue(),
+            Data_Timespan_TimeSpanFormat = el.Attribute("Data-Timespan_TimeSpanFormat")?.ToStringValue(),
+            Data_Nested_ReportStyle = el.Attribute("Data-Nested_ReportStyle")?.ToStringValue(),
             Data_Nested_ReportFontSize = el.Attribute("Data-Nested_ReportFontSize").ToInt(),
             Data_Nested_ReportHideCreatedBy = el.Attribute("Data-Nested_ReportHideCreatedBy").ToBoolean(),
             Data_Nested_ReportHideESignatureBy = el.Attribute("Data-Nested_ReportHideESignatureBy").ToBoolean(),
             Data_Nested_ReportHideIsDeleted = el.Attribute("Data-Nested_ReportHideIsDeleted").ToBoolean(),
-            Data_ManualIPC_Url = el.Attribute("Data-ManualIPC_Url")?.Value,
-            Data_MesEvent_Url = el.Attribute("Data-MesEvent_Url")?.Value,
+            Data_ManualIPC_Url = el.Attribute("Data-ManualIPC_Url")?.ToStringValue(),
+            Data_MesEvent_Url = el.Attribute("Data-MesEvent_Url")?.ToStringValue(),
         };
     }
 

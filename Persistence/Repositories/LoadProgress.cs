@@ -22,6 +22,10 @@ public class LoadProgress
     public string HieararchicalPhaseNumber => $"{OperationNumber}.{PhaseNumber}";
     public string HierarchicalStepNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}";
     public string HierarchicalSubStepNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}.{SubStepNumber}";
+    public int EventSubStepNumber => 0;
+    public int EventPropertyNumber => 0;
+    public string HierarchicalEventSubStepNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}.{EventSubStepNumber}";
+    public string EventPropertyName => $"$Event_{OperationNumber}.{PhaseNumber}.{StepNumber}";
 
     public LoadProgress(string formula, int edition, 
         int revision, bool isNestedEditorTypesLoad = false)

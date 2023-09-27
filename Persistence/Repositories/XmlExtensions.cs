@@ -25,6 +25,18 @@ public static class XmlExtensions
     return parsedDateTime;
   }
 
+  public static TimeSpan ToTimeSpan(this XAttribute attribute)
+  {
+    if (attribute == null) return TimeSpan.Zero;
+
+    if (!TimeSpan.TryParse(attribute.Value, out TimeSpan parsedTimeSpan))
+    {
+        return TimeSpan.Zero;
+    }
+
+    return parsedTimeSpan;
+  }
+
   public static int FromHierarchicalNumber(this XAttribute attribute)
   {
     if (attribute == null
@@ -75,6 +87,13 @@ public static class XmlExtensions
     {
       return SecurityLevel.Disabled;
     }
+  }
+
+  public static MesReportCsvStyle ToReportCsvStyle(this XAttribute attribute)
+  {
+    var result = (MesReportCsvStyle)Enum.Parse(typeof(MesReportCsvStyle), attribute.Value, true);
+
+    return result;
   }
 
   public static MesIFramePosition ToIFramePosition(this XAttribute attribute)

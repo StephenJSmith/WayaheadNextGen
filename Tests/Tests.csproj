@@ -28,6 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="901020-NEW.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="901020.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
