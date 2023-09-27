@@ -44,7 +44,7 @@
                               PostExecutionScript = ""
             >
               <SubSteps>
-                <SubStep          Number              = "1.1.1.0"
+                <!-- <SubStep          Number              = "1.1.1.0"
                                   Name                = ""
                                   Description1        = "Event entry - Please enter any Events / Deviations / Comments in the table below."
                                   Description2        = ""
@@ -85,8 +85,8 @@
                                     ReportType          = "StandardAndChildReport"
                                     ReportCsvStyle      = "0"
                                     ReportCsvFontSize   = "0"
-                  />
-                </SubStep>
+                  
+                </SubStep>  /> -->
                 <SubStep          Number              = "1.1.1.1"
                                   Description1        = "Picking Instructions"
                                   Description2        = ""

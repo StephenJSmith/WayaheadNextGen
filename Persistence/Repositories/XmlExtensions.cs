@@ -89,11 +89,20 @@ public static class XmlExtensions
     }
   }
 
-  public static MesReportCsvStyle ToReportCsvStyle(this XAttribute attribute)
+  public static MesReportCsvStyle? ToReportCsvStyle(this XAttribute attribute)
   {
-    var result = (MesReportCsvStyle)Enum.Parse(typeof(MesReportCsvStyle), attribute.Value, true);
+    if (attribute == null) return null;
 
-    return result;
+    try
+    {
+      var result = (MesReportCsvStyle)Enum.Parse(typeof(MesReportCsvStyle), attribute.Value, true);
+
+      return result;
+    }
+    catch (Exception ex)
+    {
+      return null;
+    }
   }
 
   public static MesIFramePosition ToIFramePosition(this XAttribute attribute)
