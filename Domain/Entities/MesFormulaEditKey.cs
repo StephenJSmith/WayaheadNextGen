@@ -13,6 +13,6 @@ public class MesFormulaEditKeys {
   public string PropertyName { get; set; }
   public string NestedPropertyNumber { get; set; }
   public string NestedPropertyName { get; set; }
-  public int NestedEditoryTypeNumber { get; set; }
+  public int NestedEditorTypeNumber { get; set; }
   public string NestedEditorTypeName { get; set; }
 }

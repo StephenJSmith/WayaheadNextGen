@@ -36,16 +36,6 @@ public class LoadProgress
         IsNestedEditorTypesLoad = isNestedEditorTypesLoad;
     }
 
-    public void InitialiseOperationNumber()
-    {
-        OperationNumber = 1;
-    }
-
-    public void IncrementOperationNumber()
-    {
-        OperationNumber++;
-    }
-
     public void SetOperationDescriptions(MesOperation mesOperation)
     {
         OperationDescription1 = mesOperation.Description1;
@@ -69,6 +59,16 @@ public class LoadProgress
     public void SetNestedEditorTypeName(string nestedEditorTypeName)
     {
         NestedEditorTypeName = nestedEditorTypeName;
+    }
+
+    public void InitialiseOperationNumber()
+    {
+        OperationNumber = 1;
+    }
+
+    public void IncrementOperationNumber()
+    {
+        OperationNumber++;
     }
 
     public void InitialisePhaseNumber()
@@ -110,6 +110,7 @@ public class LoadProgress
     {
         PropertyNumber++;
     }
+
     public void InitialiseNestedEditorTypeNumber()
     {
         NestedEditorTypeNumber = 1;
@@ -192,8 +193,8 @@ public class LoadProgress
             Formula = Formula,
             Edition = Edition,
             Revision = Revision,
-            NestedEditoryTypeNumber = NestedEditorTypeNumber,
-            NestedPropertyName = NestedEditorTypeName
+            NestedEditorTypeNumber = NestedEditorTypeNumber,
+            NestedEditorTypeName = NestedEditorTypeName
         };
     }
 

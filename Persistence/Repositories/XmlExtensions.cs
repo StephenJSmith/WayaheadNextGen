@@ -89,9 +89,9 @@ public static class XmlExtensions
     }
   }
 
-  public static MesReportCsvStyle? ToReportCsvStyle(this XAttribute attribute)
+  public static MesReportCsvStyle ToReportCsvStyle(this XAttribute attribute)
   {
-    if (attribute == null) return null;
+    if (attribute == null) return MesReportCsvStyle.Vertical;
 
     try
     {
@@ -101,11 +101,28 @@ public static class XmlExtensions
     }
     catch (Exception ex)
     {
-      return null;
+      return MesReportCsvStyle.Vertical;
     }
   }
 
-  public static MesIFramePosition ToIFramePosition(this XAttribute attribute)
+    public static MesReportType ToReportType(this XAttribute attribute)
+    {
+        if (attribute == null
+          || string.IsNullOrWhiteSpace(attribute.Value)) return MesReportType.Standard;
+
+        try
+        {
+            var result = (MesReportType)Enum.Parse(typeof(MesReportType), attribute.Value, true);
+
+            return result;
+        }
+        catch (Exception)
+        {
+            return MesReportType.Standard;
+        }
+    }
+
+    public static MesIFramePosition ToIFramePosition(this XAttribute attribute)
   {
     if (attribute == null
       || string.IsNullOrWhiteSpace(attribute.Value)) return MesIFramePosition.After;
@@ -119,23 +136,6 @@ public static class XmlExtensions
     catch (Exception)
     {
       return MesIFramePosition.After;
-    }
-  }
-
-  public static MesReportType? ToReportType(this XAttribute attribute)
-  {
-    if (attribute == null
-      || string.IsNullOrWhiteSpace(attribute.Value)) return null;
-
-    try
-    {
-    var result = (MesReportType)Enum.Parse(typeof(MesReportType), attribute.Value, true);
-
-    return result;
-    }
-    catch (Exception)
-    {
-      return null;
     }
   }
 
