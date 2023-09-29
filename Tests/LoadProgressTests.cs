@@ -351,7 +351,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GetPropertyParentEditKeys()
+        public void GetPropertyParentEditKeys_WhenNOTIsNestedEditorType_ThenOperationPropertyParentEditKeys()
         {
             var sut = new LoadProgress(TestFormulaName, TestEdition, TestRevision);
             var expected = new MesFormulaEditKeys {
@@ -380,7 +380,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GetNestedEditorTypePropertyParentEditKeys()
+        public void GetPropertyParentEditKeys_WhenISNestedEditorType_ThenGetNestedEditorTypePropertyParentEditKeys()
         {
             var testEditorTypeName = "Test Editor";
             var sut = new LoadProgress(TestFormulaName, TestEdition, TestRevision, true);
@@ -391,15 +391,26 @@ namespace Tests
                 NestedEditorTypeNumber = 2,
                 NestedEditorTypeName = testEditorTypeName
             };
+            sut.InitialiseOperationNumber();
+            sut.IncrementOperationNumber();
+            sut.InitialisePhaseNumber();
+            sut.IncrementPhaseNumber();
+            sut.IncrementPhaseNumber();
+            sut.InitialiseStepNumber();
+            sut.InitialiseSubStepNumber();
+            sut.IncrementSubStepNumber();
+            sut.InitialisePropertyNumber();
+            sut.IncrementPropertyNumber();
+
             sut.InitialiseNestedEditorTypeNumber();
             sut.IncrementNestedEditorTypeNumber();
             sut.SetNestedEditorTypeName(testEditorTypeName);
             sut.InitialisePropertyNumber();
             sut.IncrementPropertyNumber();
 
-            var actual = sut.GetNestedEditorTypePropertyParentEditKeys();
+            var actual = sut.GetPropertyParentEditKeys();
 
-            actual.Should().Be(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
