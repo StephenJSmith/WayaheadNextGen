@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Persistence.Repositories;
 
 namespace Tests
@@ -12,7 +13,8 @@ namespace Tests
       var testFormulaName = "901020";
       var testEdition = 1;
       var testRevision = 1;
-      var sut = new FormulaStepsRepository();
+      var mesFormulaXmlLoader = new MesFormulaXmlLoader();
+      var sut = new FormulaStepsRepository(mesFormulaXmlLoader);
 
       var actual = sut.GetFormulaSteps(testPathFile, testFormulaName, testEdition, testRevision);
 
@@ -25,7 +27,8 @@ namespace Tests
       var testFormulaName = "901020";
       var testEdition = 1;
       var testRevision = 1;
-      var sut = new FormulaStepsRepository();
+      var mesFormulaXmlLoader = new MesFormulaXmlLoader();
+      var sut = new FormulaStepsRepository(mesFormulaXmlLoader);
 
       var actual = sut.GetFormulaStepsWithEventSubStep(testPathFile, testFormulaName, testEdition, testRevision);
     }
