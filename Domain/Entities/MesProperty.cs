@@ -48,4 +48,7 @@ public class MesProperty
   public MesReportCsvStyle? ReportCsvStyle { get; set; }
   public int ReportCsvFontSize { get; set; }
   public Dictionary<string, string> Data { get; set; } = new Dictionary<string, string>();
+  public bool IsMesEvent => Name != null && Name.Contains("MesEvent", StringComparison.InvariantCultureIgnoreCase)
+    ||(IFrameUrl != null && IFrameUrl.Contains("MesEvent", StringComparison.InvariantCultureIgnoreCase))
+    || (IFrameUrl2 != null && IFrameUrl2.Contains("MesEvent", StringComparison.InvariantCultureIgnoreCase));
 }

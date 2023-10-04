@@ -13,4 +13,6 @@ public class MesSubStep
 	public string PreRenderScript { get; set; }
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
+	public bool IsMesEvent => Properties != null 
+		&& Properties.Any(p => p.IsMesEvent);
 }

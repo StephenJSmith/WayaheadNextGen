@@ -153,10 +153,7 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
 
   private List<MesSubStep> GetSubSteps(XElement stepXEl, LoadProgress loadProgress)
   {
-    var mesSubSteps = new List<MesSubStep>
-        {
-            GetEventSubStep(loadProgress)
-        };
+    var mesSubSteps = new List<MesSubStep>();
     loadProgress.InitialiseSubStepNumber();
 
     foreach (var subStepXEl in stepXEl.Descendants(SubStepXml))
@@ -164,6 +161,11 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
       var subStep = GetSubStep(subStepXEl, loadProgress);
       mesSubSteps.Add(subStep);
       loadProgress.IncrementSubStepNumber();
+    }
+
+    if (!mesSubSteps.Any(sub => sub.IsMesEvent))
+    {
+      mesSubSteps.Insert(0, GetEventSubStep(loadProgress));
     }
 
     return mesSubSteps;
@@ -556,6 +558,8 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
         Uom = el.Attribute("UOM").ToStringValue(),
         RunProgram1 = el.Attribute("RunProgram1").ToStringValue(),
         RunProgram2 = el.Attribute("RunProgram2").ToStringValue(),
+        IFrameUrl = el.Attribute("IFrameUrl").ToStringValue(),
+        IFrameUrl2 = el.Attribute("IFrameUrl2").ToStringValue(),
         IFramePosition = el.Attribute("IframePosition").ToIFramePosition(),
         ChildReport = el.Attribute("ChildReport").ToStringValue(),
         FullSize = el.Attribute("FullSize").ToBoolean(),
