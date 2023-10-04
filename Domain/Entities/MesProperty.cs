@@ -51,4 +51,5 @@ public class MesProperty
   public bool IsMesEvent => Name != null && Name.Contains("MesEvent", StringComparison.InvariantCultureIgnoreCase)
     ||(IFrameUrl != null && IFrameUrl.Contains("MesEvent", StringComparison.InvariantCultureIgnoreCase))
     || (IFrameUrl2 != null && IFrameUrl2.Contains("MesEvent", StringComparison.InvariantCultureIgnoreCase));
+  public bool IsInsertedMesEvent => Name != null && Name.ToLower().StartsWith("$event_");
 }

@@ -15,4 +15,6 @@ public class MesSubStep
 	public string ReferenceNo { get; set; }
 	public bool IsMesEvent => Properties != null 
 		&& Properties.Any(p => p.IsMesEvent);
+	public bool IsInsertedMesEvent => Properties != null
+		&& Properties.Any(p => p.IsInsertedMesEvent);
 }
