@@ -15,4 +15,19 @@ public class MesOperation {
 	public string PreRenderScript { get; set; }
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
+
+	public MesPhase GetMesPhase(MesFormulaEditKeys keys)
+	{
+		if (keys == null)
+		{
+			throw new ProgramException("Mes formula edit keys cannot be null.");
+		}
+
+		var phase = Phases.FirstOrDefault(ph => ph.Number == keys.PhaseNumber);
+		if (phase == null) {
+			throw new ProgramException($"Mes phase number [{keys.PhaseHierarchicalNumber}] cannot be found.");
+		}
+
+		return phase;
+	}
 }

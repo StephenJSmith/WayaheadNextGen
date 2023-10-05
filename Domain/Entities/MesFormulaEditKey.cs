@@ -15,4 +15,11 @@ public class MesFormulaEditKeys {
   public string NestedPropertyName { get; set; }
   public int NestedEditorTypeNumber { get; set; }
   public string NestedEditorTypeName { get; set; }
+  public string PhaseHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}";
+  public string StepHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}";
+  public string SubStepHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}.{SubStepNumber}";
+
+  public bool CanSearchProperty => string.IsNullOrWhiteSpace(NestedPropertyName);
+  public bool CanSearchNestedPropertyChild => !CanSearchProperty && NestedPropertyName != PropertyName;
+  public string NestedPropertyChildName => $"{NestedPropertyName}.{PropertyName}";
 }

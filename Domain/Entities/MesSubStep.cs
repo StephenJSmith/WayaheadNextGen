@@ -17,4 +17,24 @@ public class MesSubStep
 		&& Properties.Any(p => p.IsMesEvent);
 	public bool IsInsertedMesEvent => Properties != null
 		&& Properties.Any(p => p.IsInsertedMesEvent);
+
+	public string SubStepHierarchicalNumber =>  $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{ParentEditKeys.StepNumber}.{Number}";
+
+	public MesProperty? GetMesProperty(MesFormulaEditKeys keys) {
+		if (keys == null)
+		{
+			throw new ProgramException("Mes formula edit keys cannot be null.");
+		}
+
+		MesProperty? property = null; 
+		if (keys.CanSearchProperty) {
+			property = Properties.FirstOrDefault(prop => prop.Name == keys.PropertyName);
+		} else if (keys.CanSearchNestedPropertyChild) {
+			throw new NotImplementedException();
+		} else {
+			property = Properties.FirstOrDefault(prop => prop.Name == keys.NestedPropertyName);
+		}
+
+		return property;
+	}
 }

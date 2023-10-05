@@ -31,4 +31,20 @@ public class MesStep {
 	public int MesEventSubStepNumber => HasInsertedMesEventSubStep
 		? SubSteps.First(sub => sub.IsMesEvent).Number
 		: -1;
+
+	public string StepHierarchicalNumber => $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{Number}";
+
+	public MesSubStep GetMesSubStep(MesFormulaEditKeys keys) {
+		if (keys == null)
+		{
+			throw new ProgramException("Mes formula edit keys cannot be null.");
+		}
+
+		var subStep = SubSteps.FirstOrDefault(sub => sub.Number == keys.SubStepNumber);
+		if (subStep == null) {
+			throw new ProgramException($"Mes sub step number [{keys.SubStepHierarchicalNumber}] cannot be found.");
+		}
+
+		return subStep;
+	}
 }
