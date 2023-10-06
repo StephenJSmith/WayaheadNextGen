@@ -30,4 +30,11 @@ public class MesOperation {
 
 		return phase;
 	}
+	
+	public MesActionKeys ToMesActionKeys()
+	{
+		return new MesActionKeys {
+			OperationNumber = Number
+		};
+	}
 }

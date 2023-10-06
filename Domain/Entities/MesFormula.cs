@@ -16,6 +16,11 @@ public class MesFormula
     public DateTime SavedOn { get; set; }
     public string SavedBy { get; set; }
 
+    public bool HasOperation(int operationNumber) 
+    {
+        return Operations.Any(op => op.Number == operationNumber);
+    }
+
     public MesOperation GetMesOperation(MesFormulaEditKeys keys)
     {
         if (keys == null)
@@ -32,6 +37,23 @@ public class MesFormula
         return operation;
     }
 
+    public MesOperation? GetMesOperation(int operationNumber)
+    {
+        var operation = Operations.FirstOrDefault(op => 
+            op.Number == operationNumber);
+
+        return operation;
+    }
+
+    public bool IsFirstOperation(int operationNumber) 
+    {
+        var first = Operations
+            .OrderBy(op => op.Number)
+            .FirstOrDefault();
+
+        return first != null && first.Number == operationNumber;
+    }
+
     public MesPhase GetMesPhase(MesFormulaEditKeys keys)
     {
         if (keys == null)
@@ -45,6 +67,30 @@ public class MesFormula
         return phase;
     }
 
+    public bool IsFirstPhase(int operationNumber, int phaseNumber)
+    {
+        var operation = GetMesOperation(operationNumber);
+        if (operation == null) return false;
+
+        var first = operation.Phases
+            .OrderBy(ph => ph.Number)
+            .FirstOrDefault();
+
+        return first != null && first.Number == phaseNumber;
+    }
+
+    public MesStep GetMesStep(MesActionKeys actionKeys) 
+    {
+        if (actionKeys == null)
+        {
+            throw new ProgramException("Mes action keys cannot be null.");
+        }
+
+        var editKeys = new MesFormulaEditKeys(actionKeys);
+
+        return GetMesStep(editKeys);
+    }
+
     public MesStep GetMesStep(MesFormulaEditKeys keys)
     {
         if (keys == null)
@@ -55,6 +101,45 @@ public class MesFormula
         var operation = GetMesOperation(keys);
         var phase = operation.GetMesPhase(keys);
         var step = phase.GetMesStep(keys);
+
+        return step;
+    }
+
+    public IList<MesStep> GetMesStepAndPreviousSteps(MesActionKeys actionKeys)
+    {
+        if (actionKeys == null)
+        {
+            throw new ProgramException("Mes action keys cannot be null.");
+        }
+
+        var editKeys = new MesFormulaEditKeys(actionKeys);
+
+        return GetMesStepAndPreviousSteps(editKeys);
+    }
+
+    public IList<MesStep> GetMesStepAndPreviousSteps(MesFormulaEditKeys keys)
+    {
+        if (keys == null)
+        {
+            throw new ProgramException("Mes formula edit keys cannot be null.");
+        }
+
+        var operation = GetMesOperation(keys);
+        var phase = operation.GetMesPhase(keys);
+        var steps = phase.GetMesStepAndPreviousSteps(keys);
+
+        return steps;
+    }
+
+    public MesStep GetFirstStep(MesFormulaEditKeys keys) {
+        if (keys == null)
+        {
+            throw new ProgramException("Mes formula edit keys cannot be null.");
+        }
+
+        var operation = GetMesOperation(keys);
+        var phase = operation.GetMesPhase(keys);
+        var step = phase.GetFirstStep();
 
         return step;
     }

@@ -47,4 +47,12 @@ public class MesStep {
 
 		return subStep;
 	}
+
+	public MesActionKeys ToMesActionKeys() {
+		return new MesActionKeys {
+			OperationNumber = OperationNumber,
+			PhaseNumber = PhaseNumber,
+			StepNumber = Number
+		};
+	}
 }

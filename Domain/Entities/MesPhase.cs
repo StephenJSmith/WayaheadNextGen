@@ -36,4 +36,35 @@ public class MesPhase
 		return step;
 	}
 
+	public IList<MesStep> GetMesStepAndPreviousSteps(MesFormulaEditKeys keys) 
+	{
+		if (keys == null)
+		{
+			throw new ProgramException("Mes formula edit keys cannot be null.");
+		}
+
+		var steps = Steps
+			.Where(st => st.Number <= keys.StepNumber)
+			.OrderBy(st => st.Number)
+			.ToList();
+
+		return steps;
+	}
+
+	public MesStep GetFirstStep() 
+	{
+		if (!Steps.Any()) {
+			throw new ProgramException($"No Mes steps");
+		}
+
+		return Steps.First();
+	}
+
+	public MesActionKeys ToMesActionKeys() {
+		return new MesActionKeys {
+			OperationNumber = OperationNumber,
+			PhaseNumber = Number
+		};
+	}
+
 }

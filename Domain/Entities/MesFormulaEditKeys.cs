@@ -22,4 +22,19 @@ public class MesFormulaEditKeys {
   public bool CanSearchProperty => string.IsNullOrWhiteSpace(NestedPropertyName);
   public bool CanSearchNestedPropertyChild => !CanSearchProperty && NestedPropertyName != PropertyName;
   public string NestedPropertyChildName => $"{NestedPropertyName}.{PropertyName}";
+
+  public MesFormulaEditKeys(MesActionKeys actionKeys)
+  {
+    Formula = actionKeys.Formula;
+    Edition = actionKeys.Edition;
+    Revision = actionKeys.Revision;
+    OperationNumber = actionKeys.OperationNumber;
+    PhaseNumber = actionKeys.PhaseNumber;
+    StepNumber = actionKeys.StepNumber;
+    SubStepNumber = actionKeys.SubStepNumber;
+    PropertyNumber = actionKeys.PropertyNumber;
+    PropertyName = actionKeys.PropertyName;
+    NestedPropertyNumber = actionKeys.NestedPropertyNumber;
+    NestedPropertyName = actionKeys.NestedPropertyName;
+  }
 }
