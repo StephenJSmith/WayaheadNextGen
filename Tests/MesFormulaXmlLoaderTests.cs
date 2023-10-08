@@ -113,7 +113,7 @@ public class MesFormulaXmlLoaderTests
   }
 
   [Fact]
-  public void GetFormulaStepsWithEventSubStep_IncludesExpectedSubSteps()
+  public void GetFormulaStepsWithEventSubStep_IncludesExpectedSubStepsPerXmlFile()
   {
     var sut = new MesFormulaXmlLoader();
     var expectedSubSteps = new Dictionary<string, IList<string>> {
