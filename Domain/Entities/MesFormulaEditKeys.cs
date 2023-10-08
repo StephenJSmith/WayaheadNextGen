@@ -37,4 +37,6 @@ public class MesFormulaEditKeys {
     NestedPropertyNumber = actionKeys.NestedPropertyNumber;
     NestedPropertyName = actionKeys.NestedPropertyName;
   }
+
+  public MesFormulaEditKeys () {}
 }
