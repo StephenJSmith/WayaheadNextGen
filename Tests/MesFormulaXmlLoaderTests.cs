@@ -209,7 +209,16 @@ public class MesFormulaXmlLoaderTests
       {"2.1.1.0", 1}, {"2.1.1.1", 3}, {"2.1.2.0", 1}, {"2.1.2.1", 1}, {"2.1.2.2", 2},
       {"3.1.1.0", 1}, {"3.1.1.1", 3}, {"3.1.2.0", 1}, {"3.1.2.1", 1}, {"3.1.3.0", 1}, 
       {"3.1.3.1", 1}, {"3.1.3.2", 1}, {"4.1.1.0", 1}, {"4.1.1.1", 3}, {"4.1.2.0", 1},
-      {"4.1.2.1", 1}, {"4.1.2.2", 1}, {"4.1.2.3", 1}, 
+      {"4.1.2.1", 1}, {"4.1.2.2", 1}, {"4.1.2.3", 1}, {"5.1.1.0", 1}, {"5.1.1.1", 3},
+      {"5.1.2.0", 1}, {"5.1.2.1", 1}, {"5.1.3.0", 1}, {"5.1.3.1", 1}, {"5.1.4.0", 1},
+      {"5.1.4.1", 2}, {"5.1.4.2", 1}, {"5.1.4.3", 1}, {"5.1.5.0", 1}, {"5.1.5.1", 1},
+      {"5.1.5.2", 1}, {"6.1.1.0", 1}, {"6.1.1.1", 3}, {"6.1.2.0", 1}, {"6.1.2.1", 1},
+      {"6.1.3.0", 1}, {"6.1.3.1", 3}, {"6.1.3.2", 1}, {"6.1.4.0", 1}, {"6.1.4.1", 1},
+      {"6.1.4.2", 1}, {"7.1.1.0", 1}, {"7.1.1.1", 3}, {"7.1.2.0", 1}, {"7.1.2.1", 1},
+      {"7.1.2.2", 2}, {"7.2.1.0", 1}, {"7.2.1.1", 3}, {"7.2.2.0", 1}, {"7.2.2.1", 1},
+      {"7.2.3.0", 1}, {"7.2.3.1", 3}, {"7.2.3.2", 1}, {"8.1.1.1", 2}, {"8.1.1.2", 1},
+      {"8.2.1.0", 1}, {"8.2.1.1", 1}, {"9.1.1.1", 1}, {"9.1.1.2", 3}, {"9.1.1.3", 2},
+      {"9.1.2.0", 1}, {"9.1.2.1", 1}
     };
 
     var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
@@ -230,6 +239,30 @@ public class MesFormulaXmlLoaderTests
       var subStep = actual.GetMesSubStep(editKeys);
       subStep.Properties.Count.Should().Be(item.Value);
     }
+  }
+
+  [Fact]
+  public void GetFormulaStepsWithEventSubStep_ReturnsOrderedSubSteps_WhenNotMatchingNumber()
+  {
+    var sut = new MesFormulaXmlLoader();
+    var testEditKeys = new MesFormulaEditKeys {
+      Formula = TestFormulaName,
+      Edition = TestEdition,
+      Revision = TestRevision,
+      OperationNumber = 9,
+      PhaseNumber = 1,
+      StepNumber = 1,
+      SubStepNumber = 3
+    };
+    var expectedSubStepNumber = "9.1.1.3";
+    var expectedSubStepDescription1 = "Quality Review Status";
+    var expectedXmlSubStepNumber = "9.1.1.5"; // XML file SubStep Number attribute value
+
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+
+    var actualSubStep = actual.GetMesSubStep(testEditKeys);
+    actualSubStep.HierarchicalNumber.Should().Be(expectedSubStepNumber);
+    actualSubStep.Description1.Should().Be(expectedSubStepDescription1);
   }
 
   #endregion
