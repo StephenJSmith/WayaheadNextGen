@@ -17,7 +17,7 @@ public class MesFormulaXmlLoaderTests
   {
     var sut = new MesFormulaXmlLoader();
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
   }
 
   [Fact]
@@ -36,7 +36,7 @@ public class MesFormulaXmlLoaderTests
       "Quality Review"
     };
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     actual.Operations.Count.Should().Be(expectedOperationDescriptions.Count);
     actual.Operations
@@ -61,7 +61,7 @@ public class MesFormulaXmlLoaderTests
       {9, new List<string>{"Review"}},
     };
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     foreach (var operation in actual.Operations)
     {
@@ -91,7 +91,7 @@ public class MesFormulaXmlLoaderTests
       {"9.1", new List<string>{"Quality Review", "Quality CloseOut"}},
     };
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     foreach (var item in expectedSteps)
     {
@@ -146,7 +146,7 @@ public class MesFormulaXmlLoaderTests
       {"9.1.2", new List<string>{"Quality Batch CloseOut"}},
     };
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     foreach (var item in expectedSubSteps)
     {
@@ -180,7 +180,7 @@ public class MesFormulaXmlLoaderTests
       "7.2.2.0", "7.2.3.0", "8.2.1.0", "9.1.2.0"
     };
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     foreach (var subStep in expectedInsertedSubSteps)
     {
@@ -221,7 +221,7 @@ public class MesFormulaXmlLoaderTests
       {"9.1.2.0", 1}, {"9.1.2.1", 1}
     };
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     foreach (var item in expectedSubStepPropertyCounts)
     {
@@ -258,27 +258,11 @@ public class MesFormulaXmlLoaderTests
     var expectedSubStepDescription1 = "Quality Review Status";
     var expectedXmlSubStepNumber = "9.1.1.5"; // XML file SubStep Number attribute value
 
-    var actual = sut.GetFormulaStepsWithEventSubStep(TestPathFile, TestFormulaName, TestEdition, TestRevision);
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     var actualSubStep = actual.GetMesSubStep(testEditKeys);
-    actualSubStep.HierarchicalNumber.Should().Be(expectedSubStepNumber);
+    actualSubStep.SubStepHierarchicalNumber.Should().Be(expectedSubStepNumber);
     actualSubStep.Description1.Should().Be(expectedSubStepDescription1);
-  }
-
-  #endregion
-
-  #region  GetFormulaSteps
-
-  [Fact]
-  public void GetFormulaSteps()
-  {
-    var testPathFile = "901020.xml";
-    var testFormulaName = "901020";
-    var testEdition = 1;
-    var testRevision = 1;
-    var sut = new MesFormulaXmlLoader();
-
-    var actual = sut.GetFormulaSteps(testPathFile, testFormulaName, testEdition, testRevision);
   }
 
   #endregion

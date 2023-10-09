@@ -12,29 +12,22 @@ public class FormulaStepsRepository : IFormulaStepsRepository
   }
 
   public MesFormula GetFormulaStepsWithEventSubStep(
-    string formulaPathFile, string formulaName, int edition, int revision)
+    string formulaName, int edition, int revision, string formulaPathFile)
   {
     return _mesFormulaXmlLoader.GetFormulaStepsWithEventSubStep(
-      formulaPathFile, formulaName, edition, revision);
+      formulaName, edition, revision, formulaPathFile);
   }
 
-  public Task<MesFormula> GetFormulaStepsWithEventSubStepAsync(
-    string formulaPathFile, string formulaName, int edition, int revision
+    public Task<MesFormula> GetFormulaStepsWithEventSubStepAsync(
+    string formulaName, int edition, int revision, string formulaPathFile
   ) {
     return Task.Run(() => GetFormulaStepsWithEventSubStep(
-      formulaPathFile, formulaName, edition, revision));
+      formulaName, edition, revision, formulaPathFile));
   }
 
-  public MesFormula GetFormulaSteps(string formulaPathFile,
-  string formulaName, int edition, int revision)
-  {
-    return _mesFormulaXmlLoader.GetFormulaSteps(
-      formulaPathFile, formulaName, edition, revision);
-  }
+    public Task<MesFormula> GetFormulaStepsWithEventSubStepAsync(string formulaPathFile, string formulaName, int edition, int revision)
+    {
+        throw new NotImplementedException();
+    }
 
-  public Task<MesFormula> GetFormulaStepsAsync(string formulaPathFile,
-  string formulaName, int edition, int revision) {
-    return Task.Run(() => GetFormulaSteps(
-      formulaPathFile, formulaName, edition, revision));
-  }
 }

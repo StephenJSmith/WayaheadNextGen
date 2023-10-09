@@ -31,7 +31,7 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
   #region GetFormulaStepsWithEventSubStep()
 
   public MesFormula GetFormulaStepsWithEventSubStep(
-  string formulaPathFile, string formulaName, int edition, int revision)
+    string formulaName, int edition, int revision, string formulaPathFile)
   {
     if (!Path.Exists(formulaPathFile)) throw new FileNotFoundException();
 
@@ -277,33 +277,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
   #region GetFormulaSteps
 
 
-  public MesFormula GetFormulaSteps(string formulaPathFile,
-  string formulaName, int edition, int revision)
-  {
-    if (!Path.Exists(formulaPathFile)) throw new FileNotFoundException();
-
-    try
-    {
-      var xElement = XElement.Load(formulaPathFile);
-
-      var mesFormula = GetFormula(xElement, formulaName, edition, revision);
-      var mesOperations = GetOperations(xElement);
-      var mesPhases = GetPhases(xElement);
-      var mesSteps = GetSteps(xElement);
-      var mesSubSteps = GetSubSteps(xElement);
-      ApplySubStepProperties(xElement, mesSubSteps);
-
-      mesFormula.Operations = GetHierarchicalElements(mesOperations, mesPhases, mesSteps, mesSubSteps);
-      mesFormula.NestedEditorTypes = GetNestedEditorTypes(xElement);
-
-      return mesFormula;
-    }
-    catch (Exception)
-    {
-      throw new XmlException();
-    }
-  }
-
   private MesFormula GetFormula(XElement xElement, string formulaName, int edition, int revision)
   {
     var formula = xElement
@@ -341,17 +314,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
     };
   }
 
-  private List<MesOperation> GetOperations(XElement xElement)
-  {
-    var result = xElement
-      .Descendants(OperationXml)
-      .Select(el => GetOperation(el))
-      .OrderBy(o => o.Number)
-      .ToList();
-
-    return result;
-  }
-
   private static MesOperation GetOperation(XElement el)
   {
     try
@@ -378,17 +340,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
     }
   }
 
-  private List<MesPhase> GetPhases(XElement xElement)
-  {
-    var result = xElement
-     .Descendants(PhaseXml)
-     .Select(el => GetPhase(el))
-     .OrderBy(ph => ph.HierarchicalNumber)
-     .ToList();
-
-    return result;
-  }
-
   private static MesPhase GetPhase(XElement el)
   {
     try
@@ -413,17 +364,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
     {
       throw new XmlException();
     }
-  }
-
-  private List<MesStep> GetSteps(XElement xElement)
-  {
-    var result = xElement
-      .Descendants(StepXml)
-      .Select(el => GetStep(el))
-      .OrderBy(st => st.HierarchicalNumber)
-      .ToList();
-
-    return result;
   }
 
   private static MesStep GetStep(XElement el)
@@ -454,17 +394,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
     }
   }
 
-  private List<MesSubStep> GetSubSteps(XElement xElement)
-  {
-    var result = xElement
-      .Descendants(SubStepXml)
-      .Select(el => GetSubStep(el))
-      .OrderBy(sub => sub.HierarchicalNumber)
-      .ToList();
-
-    return result;
-  }
-
   private static MesSubStep GetSubStep(XElement el)
   {
     try
@@ -488,16 +417,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
     }
   }
 
-  private List<MesNestedEditorType> GetNestedEditorTypes(XElement xElement)
-  {
-    var nestedEditorTypes = xElement
-      .Descendants(NestedEditorTypeXml)
-      .Select(el => GetNestedEditorType(el))
-      .ToList();
-
-    return nestedEditorTypes;
-  }
-
   private static MesNestedEditorType GetNestedEditorType(XElement el)
   {
     return new MesNestedEditorType
@@ -507,20 +426,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
       Description2 = el.Attribute(Description2Xml).ToStringValue(),
       Properties = GetProperties(el)
     };
-  }
-
-  private void ApplySubStepProperties(XElement xElement, List<MesSubStep> mesSubSteps)
-  {
-    mesSubSteps.ForEach(sub =>
-    {
-      var subStepXml = xElement
-            .Descendants(SubStepXml)
-            .Where(el => el.Attribute(NumberXml).ToStringValue() == sub.HierarchicalNumber)
-            .FirstOrDefault();
-
-      List<MesProperty> properties = GetProperties(subStepXml);
-      sub.Properties = properties;
-    });
   }
 
   private static List<MesProperty> GetProperties(XElement parentElement)
@@ -584,31 +489,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
     {
       throw new XmlException();
     }
-  }
-
-  private List<MesOperation> GetHierarchicalElements(
-      List<MesOperation> mesOperations,
-      List<MesPhase> mesPhases,
-      List<MesStep> mesSteps,
-      List<MesSubStep> mesSubSteps)
-  {
-    mesSteps.ForEach(st =>
-      st.SubSteps = mesSubSteps
-        .Where(sub => sub.HierarchicalNumber.StartsWith(st.HierarchicalNumber))
-        .ToList()
-    );
-
-    mesPhases.ForEach(ph =>
-      ph.Steps = mesSteps
-        .Where(st => st.HierarchicalNumber.StartsWith(ph.HierarchicalNumber))
-        .ToList()
-    );
-
-    mesOperations.ForEach(op =>
-      op.Phases = mesPhases.Where(ph => ph.HierarchicalNumber.StartsWith(op.Number.ToString())).ToList()
-    );
-
-    return mesOperations;
   }
 
   #endregion
