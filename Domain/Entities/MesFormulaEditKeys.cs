@@ -23,6 +23,8 @@ public class MesFormulaEditKeys {
   public bool CanSearchNestedPropertyChild => !CanSearchProperty && NestedPropertyName != PropertyName;
   public string NestedPropertyChildName => $"{NestedPropertyName}.{PropertyName}";
 
+  public MesFormulaEditKeys () {}
+
   public MesFormulaEditKeys(MesActionKeys actionKeys)
   {
     Formula = actionKeys.Formula;
@@ -37,6 +39,4 @@ public class MesFormulaEditKeys {
     NestedPropertyNumber = actionKeys.NestedPropertyNumber;
     NestedPropertyName = actionKeys.NestedPropertyName;
   }
-
-  public MesFormulaEditKeys () {}
 }

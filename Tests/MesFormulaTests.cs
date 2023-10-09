@@ -19,7 +19,7 @@ public class MesFormulaTests {
     return sut;
   }
 
-  private MesFormulaEditKeys GetEditKeys(int operationNumber)
+  private MesFormulaEditKeys GetEditKeysForOperation(int operationNumber)
   {
     return new MesFormulaEditKeys {
       Formula = TestFormulaName,
@@ -29,7 +29,7 @@ public class MesFormulaTests {
     };
   }
 
-  private MesFormulaEditKeys GetEditKeys(
+  private MesFormulaEditKeys GetEditKeysForPhase(
     int operationNumber, int phaseNumber)
   {
     return new MesFormulaEditKeys {
@@ -41,7 +41,7 @@ public class MesFormulaTests {
     };
   }
 
-  private MesFormulaEditKeys GetEditKeys(
+  private MesFormulaEditKeys GetEditKeysForStep(
     int operationNumber, int phaseNumber, int stepNumber)
   {
     return new MesFormulaEditKeys {
@@ -54,7 +54,7 @@ public class MesFormulaTests {
     };
   }
 
-  private MesFormulaEditKeys GetEditKeys(
+  private MesFormulaEditKeys GetEditKeysForSubStep(
     int operationNumber, int phaseNumber, int stepNumber, int subStepNumber)
   {
     return new MesFormulaEditKeys {
@@ -68,7 +68,7 @@ public class MesFormulaTests {
     };
   }
 
-  private MesFormulaEditKeys GetEditKeys(
+  private MesFormulaEditKeys GetEditKeysForProperty(
     int operationNumber, int phaseNumber, int stepNumber, 
     int subStepNumber, string propertyName)
   {
@@ -117,7 +117,7 @@ public class MesFormulaTests {
   )
   {
     var sut = GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber);
+    var testEditKeys = GetEditKeysForOperation(testOperationNumber);
 
     var actual = sut.GetMesOperation(testEditKeys);
 
@@ -133,7 +133,7 @@ public class MesFormulaTests {
   {
     var sut = GetSubjectUnderTest();
     var testOperationNumber = 10;
-    var testEditKeys = GetEditKeys(testOperationNumber);
+    var testEditKeys = GetEditKeysForOperation(testOperationNumber);
 
     Assert.Throws<ProgramException>(() => sut.GetMesOperation(testEditKeys));
   }
@@ -167,7 +167,7 @@ public class MesFormulaTests {
   public void GetMesPhase(int testOperationNumber, int testPhaseNumber, string expectedPhaseDescription, string[] expectedStepDescriptions)
   {
     var sut = GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber, testPhaseNumber);
+    var testEditKeys = GetEditKeysForPhase(testOperationNumber, testPhaseNumber);
 
     var actual = sut.GetMesPhase(testEditKeys);
 
@@ -198,7 +198,7 @@ public class MesFormulaTests {
   public void GetMesStep(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expectedStepDescription) 
   {
     var sut = GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber, testPhaseNumber, testStepNumber);
+    var testEditKeys = GetEditKeysForStep(testOperationNumber, testPhaseNumber, testStepNumber);
 
     var actual = sut.GetMesStep(testEditKeys);
 
@@ -211,7 +211,7 @@ public class MesFormulaTests {
   public void GetMesStepAndPreviousSteps(int testOperationNumber, int testPhaseNumber, int testStepNumber, string[] expectedStepDescriptions)
   {
     var sut = GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber, testPhaseNumber, testStepNumber);
+    var testEditKeys = GetEditKeysForStep(testOperationNumber, testPhaseNumber, testStepNumber);
 
     var actual = sut.GetMesStepAndPreviousSteps(testEditKeys);
 
@@ -228,7 +228,7 @@ public class MesFormulaTests {
   public void GetFirstStep(int testOperationNumber, int testPhaseNumber, string expectedDescription)
   {
     var sut = GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber, testPhaseNumber);
+    var testEditKeys = GetEditKeysForPhase(testOperationNumber, testPhaseNumber);
 
     var actual  = sut.GetFirstStep(testEditKeys);
 
@@ -245,7 +245,7 @@ public class MesFormulaTests {
   public void GetMesSubStep(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expectedDescription)
   {
     var sut= GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
+    var testEditKeys = GetEditKeysForSubStep(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
 
     var actual = sut.GetMesSubStep(testEditKeys);
 
@@ -261,7 +261,7 @@ public class MesFormulaTests {
     string testPropertyName, string expectedDescription, string expectedEditorType)
   {
     var sut= GetSubjectUnderTest();
-    var testEditKeys = GetEditKeys(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber, testPropertyName);
+    var testEditKeys = GetEditKeysForProperty(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber, testPropertyName);
 
     var actual = sut.GetMesProperty(testEditKeys);
 
