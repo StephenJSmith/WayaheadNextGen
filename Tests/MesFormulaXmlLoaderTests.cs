@@ -256,13 +256,32 @@ public class MesFormulaXmlLoaderTests
     };
     var expectedSubStepNumber = "9.1.1.3";
     var expectedSubStepDescription1 = "Quality Review Status";
-    var expectedXmlSubStepNumber = "9.1.1.5"; // XML file SubStep Number attribute value
+    // var expectedXmlSubStepNumber = "9.1.1.5"; // XML file SubStep Number attribute value
 
     var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
 
     var actualSubStep = actual.GetMesSubStep(testEditKeys);
     actualSubStep.SubStepHierarchicalNumber.Should().Be(expectedSubStepNumber);
     actualSubStep.Description1.Should().Be(expectedSubStepDescription1);
+  }
+
+  [Fact]
+  public void GetFormulaStepsWithEventSubStep_ReturnsNestedEditorTypesAndProperties()
+  {
+    var sut = new MesFormulaXmlLoader();
+    var expectedNestedEditorTypes = new Dictionary<string, IList<string>> {
+      {"TST_MedicineTest", new List<string> {
+        "BinNumber", "TareWeight", "GrossWeight", "NettWeight", "RelativeDensity", "CheckSmell", "CheckColor", "CheckImpurity"} 
+      }};
+
+    var actual = sut.GetFormulaStepsWithEventSubStep(TestFormulaName, TestEdition, TestRevision, TestPathFile);
+
+    actual.NestedEditorTypes.Count.Should().Be(expectedNestedEditorTypes.Keys.Count);
+    actual.NestedEditorTypes.ForEach(et => {
+      var properties = et.Properties.Select(pr => pr.Name);
+      var expectedProperties = expectedNestedEditorTypes[et.Name];
+      expectedProperties.Should().BeEquivalentTo(expectedProperties);
+    });
   }
 
   #endregion

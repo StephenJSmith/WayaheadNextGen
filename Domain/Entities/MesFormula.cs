@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-
 namespace Domain.Entities;
 
 public class MesFormula
@@ -16,7 +14,7 @@ public class MesFormula
     public DateTime SavedOn { get; set; }
     public string SavedBy { get; set; }
 
-    public bool HasOperation(int operationNumber) 
+    public bool HasOperation(int operationNumber)
     {
         return Operations.Any(op => op.Number == operationNumber);
     }
@@ -37,15 +35,15 @@ public class MesFormula
         return operation;
     }
 
-    public MesOperation? GetMesOperation(int operationNumber)
+    public MesOperation GetMesOperation(int operationNumber)
     {
-        var operation = Operations.FirstOrDefault(op => 
+        var operation = Operations.FirstOrDefault(op =>
             op.Number == operationNumber);
 
         return operation;
     }
 
-    public bool IsFirstOperation(int operationNumber) 
+    public bool IsFirstOperation(int operationNumber)
     {
         var first = Operations
             .OrderBy(op => op.Number)
@@ -79,7 +77,7 @@ public class MesFormula
         return first != null && first.Number == phaseNumber;
     }
 
-    public MesStep GetMesStep(MesActionKeys actionKeys) 
+    public MesStep GetMesStep(MesActionKeys actionKeys)
     {
         if (actionKeys == null)
         {
@@ -131,7 +129,8 @@ public class MesFormula
         return steps;
     }
 
-    public MesStep GetFirstStep(MesFormulaEditKeys keys) {
+    public MesStep GetFirstStep(MesFormulaEditKeys keys)
+    {
         if (keys == null)
         {
             throw new ProgramException("Mes formula edit keys cannot be null.");
@@ -144,7 +143,8 @@ public class MesFormula
         return step;
     }
 
-    public MesSubStep GetMesSubStep(MesFormulaEditKeys keys) {
+    public MesSubStep GetMesSubStep(MesFormulaEditKeys keys)
+    {
         if (keys == null)
         {
             throw new ProgramException("Mes formula edit keys cannot be null.");
@@ -158,7 +158,7 @@ public class MesFormula
         return subStep;
     }
 
-    public MesProperty? GetMesProperty(MesFormulaEditKeys keys)
+    public MesProperty GetMesProperty(MesFormulaEditKeys keys)
     {
         if (keys == null)
         {
@@ -173,24 +173,20 @@ public class MesFormula
 
         return property;
     }
-}
 
-[Serializable]
-internal class ProgramException : Exception
-{
-    public ProgramException()
+    public MesNestedEditorType GetMesNestedEditorType(MesFormulaEditKeys keys)
     {
-    }
+        if (keys == null)
+        {
+            throw new ProgramException("Mes formula edit keys cannot be null.");
+        }
 
-    public ProgramException(string? message) : base(message)
-    {
-    }
+        var nestedEditorType = NestedEditorTypes
+            .FirstOrDefault(net => net.Number == keys.NestedEditorTypeNumber);
+        if (nestedEditorType == null) {
+            throw new ProgramException($"No Mes nested editor type found for [{keys.NestedEditorTypeNumber}]");
+        }
 
-    public ProgramException(string? message, Exception? innerException) : base(message, innerException)
-    {
-    }
-
-    protected ProgramException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
+        return nestedEditorType;
     }
 }

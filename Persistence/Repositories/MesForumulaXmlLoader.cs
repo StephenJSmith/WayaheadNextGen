@@ -28,8 +28,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
   private const string ReferenceNoXml = "ReferenceNo";
   private const string SecurityLevelXml = "SecurityLevel";
 
-  #region GetFormulaStepsWithEventSubStep()
-
   public MesFormula GetFormulaStepsWithEventSubStep(
     string formulaName, int edition, int revision, string formulaPathFile)
   {
@@ -185,6 +183,8 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
                 {
                     PropertyNumber = loadProgress.EventPropertyNumber,
                     Name = loadProgress.EventPropertyName,
+                    Description1 = "",
+                    Description2 = "",
                     ParentEditKeys = loadProgress.GetPropertyParentEditKeys(),
                     SecurityLevel = SecurityLevel.Disabled,
                     CheckCompletion = true,
@@ -271,11 +271,6 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
 
     return nestedType;
   }
-
-  #endregion
-
-  #region GetFormulaSteps
-
 
   private MesFormula GetFormula(XElement xElement, string formulaName, int edition, int revision)
   {
@@ -490,7 +485,4 @@ public class MesFormulaXmlLoader : IMesFormulaXmlLoader {
       throw new XmlException();
     }
   }
-
-  #endregion
-
 }
