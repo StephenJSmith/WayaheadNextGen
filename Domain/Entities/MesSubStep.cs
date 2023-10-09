@@ -20,13 +20,13 @@ public class MesSubStep
 
 	public string SubStepHierarchicalNumber =>  $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{ParentEditKeys.StepNumber}.{Number}";
 
-	public MesProperty? GetMesProperty(MesFormulaEditKeys keys) {
+	public MesProperty GetMesProperty(MesFormulaEditKeys keys) {
 		if (keys == null)
 		{
 			throw new ProgramException("Mes formula edit keys cannot be null.");
 		}
 
-		MesProperty? property = null; 
+		MesProperty property = null; 
 		if (keys.CanSearchProperty) {
 			property = Properties.FirstOrDefault(prop => prop.Name == keys.PropertyName);
 		} else if (keys.CanSearchNestedPropertyChild) {
