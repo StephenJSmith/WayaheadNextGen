@@ -16,6 +16,11 @@ public class MesOperation {
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
 
+	public MesPhase FirstPhase => 
+		Phases
+			.OrderBy(x => x.Number)
+			.FirstOrDefault();
+
 	public MesPhase GetMesPhase(MesFormulaEditKeys keys)
 	{
 		if (keys == null)

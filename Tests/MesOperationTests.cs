@@ -42,6 +42,19 @@ public class MesOperationTests {
     };
   }
 
+  [Theory]  
+  [InlineData(1, "Picking")]
+  [InlineData(2, "Check Order")]
+  [InlineData(5, "Mixing")]
+  [InlineData(8, "Events/Comments Entry")]
+  public void FirstPhase(int testOperationNumber, string expectedPhaseDescription) {
+    var sut = GetSubjectUnderTest(testOperationNumber);
+
+    var actual = sut.FirstPhase;
+
+    actual.Description1.Should().Be(expectedPhaseDescription);
+  }
+
   [Theory]
   [InlineData(1, 1, "Picking", new string[] {"Picking Instructions", "Print Picking Report"})]
   [InlineData(7, 2, "Pack", new string[] {"Packing Instructions",  "Packing Equipment", "Packing"})]
@@ -67,5 +80,4 @@ public class MesOperationTests {
 
     Assert.Throws<ProgramException>(() => sut.GetMesPhase(testEditKeys));
   }
-  
 }
