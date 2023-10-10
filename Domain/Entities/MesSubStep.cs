@@ -20,6 +20,11 @@ public class MesSubStep
 
 	public string SubStepHierarchicalNumber =>  $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{ParentEditKeys.StepNumber}.{Number}";
 
+	public MesProperty FirstProperty => 
+		Properties
+			.OrderBy(pr => pr.PropertyNumber)
+			.FirstOrDefault();
+
 	public MesProperty GetMesProperty(MesFormulaEditKeys keys) {
 		if (keys == null)
 		{
