@@ -32,7 +32,9 @@ public class MesStep {
 		? SubSteps.First(sub => sub.IsMesEvent).Number
 		: -1;
 
-	public string StepHierarchicalNumber => $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{Number}";
+	public string StepHierarchicalNumber => ParentEditKeys != null
+			? $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{Number}"
+			: $"?.?.{Number}";
 
 	public MesSubStep GetMesSubStep(MesFormulaEditKeys keys) {
 		if (keys == null)
@@ -47,6 +49,53 @@ public class MesStep {
 
 		return subStep;
 	}
+
+	public void CreateRequiredMesEventSubStep() {
+		if (SubSteps.Any(sub => sub.IsMesEvent)) return;
+		if (SubSteps.Any(sub => sub.IsInsertedMesEvent)) return;
+
+    SubSteps.Insert(0, GetEventSubStep());
+	}
+
+        private MesSubStep GetEventSubStep()
+        {
+            var parentEditKeys = ParentEditKeys.Clone();
+            parentEditKeys.StepNumber = Number;
+
+            var mesSubStep = new MesSubStep
+            {
+                Number = 0,
+                Description1 = "Event entry - Please enter any Events / Deviations / Comments in the table below.",
+                ParentEditKeys = parentEditKeys,
+                Properties = new List<MesProperty> {
+                    new MesProperty
+                    {
+                        Name = $"$Event_{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{Number}",
+                        Description1 = "",
+                        Description2 = "",
+                        ParentEditKeys = ParentEditKeys.Clone(),
+                        SecurityLevel = SecurityLevel.Disabled,
+                        CheckCompletion = true,
+                        CompletionErrorMessage = "Please select YES to indicate that all entries have been added to table.",
+                        EditorType = MesEditorType.YesNo,
+                        DefaultValue = "Yes",
+                        IFrameUrl = "/MesAuxiliary/MesEvent/",
+                        IFramePosition = MesIFramePosition.After,
+                        ChildReport = "MesEventReport.frx",
+                        FullSize = true,
+                        PictureEvidence = false,
+                        Disable = false,
+                        Hide = true,
+                        Nullable = false,
+                        ReportType = MesReportType.StandardAndChildReport,
+                        ReportCsvStyle = 0,
+                        ReportCsvFontSize = 0,
+                    }
+                }
+            };
+
+            return mesSubStep;
+        }
 
 	public MesActionKeys ToMesActionKeys() {
 		return new MesActionKeys {
