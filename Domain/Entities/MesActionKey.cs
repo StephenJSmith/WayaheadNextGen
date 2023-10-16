@@ -1,6 +1,7 @@
 namespace Domain.Entities;
 
-public class MesActionKeys {
+public class MesActionKeys
+{
   public string Batch { get; set; }
   public string LinkedBatch { get; set; }
   public string Formula { get; set; }
@@ -18,5 +19,13 @@ public class MesActionKeys {
   public string PropertyName { get; set; }
   public string NestedPropertyNumber { get; set; }
   public string NestedPropertyName { get; set; }
+
+  public string PhaseHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}";
+
+  public string StepHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}";
+
+  public string SubStepHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}.{SubStepNumber}";
+
+  public bool IsInitialMesPageLoad => string.IsNullOrWhiteSpace(Batch);
 
 }

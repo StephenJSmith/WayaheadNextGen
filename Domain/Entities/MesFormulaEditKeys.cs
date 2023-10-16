@@ -21,7 +21,6 @@ public class MesFormulaEditKeys {
 
   public bool CanSearchProperty => string.IsNullOrWhiteSpace(NestedPropertyName);
   public bool CanSearchNestedPropertyChild => !CanSearchProperty && NestedPropertyName != PropertyName;
-  public string NestedPropertyChildName => $"{NestedPropertyName}.{PropertyName}";
 
   public MesFormulaEditKeys () {}
 
