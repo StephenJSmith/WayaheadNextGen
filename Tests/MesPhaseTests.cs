@@ -37,7 +37,8 @@ public class MesPhaseTests
   private MesFormulaEditKeys GetEditKeysForStep(
     int operationNumber, int phaseNumber, int stepNumber)
   {
-    return new MesFormulaEditKeys {
+    return new MesFormulaEditKeys
+    {
       Formula = TestFormulaName,
       Edition = TestEdition,
       Revision = TestRevision,
@@ -59,20 +60,36 @@ public class MesPhaseTests
     actual.Should().Be(expected);
   }
 
+  [Fact]
+  public void PhaseHierarchicalNumber_WhenNoParentEditKeys_UseQuestionMarkForParentProperties()
+  {
+    var testOperationNumber = 7;
+    var testPhaseNumber = 2;
+    var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber);
+    sut.ParentEditKeys = null;
+    var expected = "?.2";
+
+    var actual = sut.PhaseHierarchicalNumber;
+
+    actual.Should().Be(expected);
+  }
+
   [Theory]
   [InlineData(1, 1, 1, "Picking Instructions")]
   [InlineData(7, 2, 3, "Packing")]
-  public void GetMesStep(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expectedStepName) {
+  public void GetMesStep(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expectedStepName)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber);
     var testEditKeys = GetEditKeysForStep(testOperationNumber, testPhaseNumber, testStepNumber);
-    
+
     var actual = sut.GetMesStep(testEditKeys);
 
     actual.Description1.Should().Be(expectedStepName);
   }
 
   [Fact]
-  public void GetMesStep_ThrowsException_WhenStepNotFound() {
+  public void GetMesStep_ThrowsException_WhenStepNotFound()
+  {
     var testOperationNumber = 1;
     var testPhaseNumber = 1;
     var testStepNumber = 3;
@@ -83,9 +100,10 @@ public class MesPhaseTests
   }
 
   [Theory]
-  [InlineData(1, 1, 1, new int[] {1})]
-  [InlineData(7, 2, 3, new int[] {1, 2, 3})]
-  public void GetMesStepAndPreviousSteps(int testOperationNumber, int testPhaseNumber, int testStepNumber, int[] expectedStepNumbers) {
+  [InlineData(1, 1, 1, new int[] { 1 })]
+  [InlineData(7, 2, 3, new int[] { 1, 2, 3 })]
+  public void GetMesStepAndPreviousSteps(int testOperationNumber, int testPhaseNumber, int testStepNumber, int[] expectedStepNumbers)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber);
     var testEditKeys = GetEditKeysForStep(testOperationNumber, testPhaseNumber, testStepNumber);
 
@@ -101,7 +119,8 @@ public class MesPhaseTests
   [Theory]
   [InlineData(1, 1, "Picking Instructions")]
   [InlineData(7, 2, "Packing Instructions")]
-  public void GetFirstStep(int testOperationNumber, int testPhaseNumber, string expectedStepDescription) {
+  public void GetFirstStep(int testOperationNumber, int testPhaseNumber, string expectedStepDescription)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber);
 
     var actual = sut.GetFirstStep();

@@ -19,7 +19,10 @@ public class MesPhase
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
 
-	public string PhaseHierarchicalNumber => $"{ParentEditKeys.OperationNumber}.{Number}";
+	public string PhaseHierarchicalNumber => ParentEditKeys != null
+			? $"{ParentEditKeys.OperationNumber}.{Number}"
+			: $"?.{Number}";
+	public bool HasPersistedInsertedMesEvents => Steps.Any(st => st.HasPersistedInsertedMesEvents);
 
 	public MesStep GetMesStep(MesFormulaEditKeys keys)
 	{
@@ -29,14 +32,15 @@ public class MesPhase
 		}
 
 		var step = Steps.FirstOrDefault(st => st.Number == keys.StepNumber);
-		if (step == null) {
+		if (step == null)
+		{
 			throw new ProgramException($"Mes step number [{keys.StepHierarchicalNumber}] cannot be found.");
 		}
 
 		return step;
 	}
 
-	public IList<MesStep> GetMesStepAndPreviousSteps(MesFormulaEditKeys keys) 
+	public IList<MesStep> GetMesStepAndPreviousSteps(MesFormulaEditKeys keys)
 	{
 		if (keys == null)
 		{
@@ -51,17 +55,20 @@ public class MesPhase
 		return steps;
 	}
 
-	public MesStep GetFirstStep() 
+	public MesStep GetFirstStep()
 	{
-		if (!Steps.Any()) {
+		if (!Steps.Any())
+		{
 			throw new ProgramException($"No Mes steps");
 		}
 
 		return Steps.First();
 	}
 
-	public MesActionKeys ToMesActionKeys() {
-		return new MesActionKeys {
+	public MesActionKeys ToMesActionKeys()
+	{
+		return new MesActionKeys
+		{
 			OperationNumber = OperationNumber,
 			PhaseNumber = Number
 		};

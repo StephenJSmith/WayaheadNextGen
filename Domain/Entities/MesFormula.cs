@@ -14,6 +14,11 @@ public class MesFormula
     public DateTime SavedOn { get; set; }
     public string SavedBy { get; set; }
 
+    public string Description => string.IsNullOrWhiteSpace(Description2)
+        ? Description1
+        : $"{Description1} / {Description2}";
+    public string FormulaName => $"{Name}/{Edition}.{Revision}";
+
     public bool HasOperation(int operationNumber)
     {
         return Operations.Any(op => op.Number == operationNumber);
@@ -169,7 +174,27 @@ public class MesFormula
         var phase = operation.GetMesPhase(keys);
         var step = phase.GetMesStep(keys);
         var subStep = step.GetMesSubStep(keys);
-        var property = subStep.GetMesProperty(keys);
+
+        MesProperty property = null;
+        if (keys.CanSearchProperty)
+        {
+            property = subStep.Properties.FirstOrDefault(pr => pr.Name == keys.PropertyName);
+        }
+        else if (keys.CanSearchNestedPropertyChild)
+        {
+            var subStepProperty = subStep.Properties.FirstOrDefault(pr => pr.Name == keys.NestedPropertyName);
+            if (subStepProperty == null
+                || !subStepProperty.IsNestedEditorType) return null;
+
+            var nestedEditorType = NestedEditorTypes.FirstOrDefault(editor => editor.Name == subStepProperty.NestedEditorName);
+            if (nestedEditorType == null) return null;
+
+            property = nestedEditorType.Properties.FirstOrDefault(pr => pr.Name == keys.PropertyName);
+        }
+        else
+        {
+            property = subStep.Properties.FirstOrDefault(pr => pr.Name == keys.NestedPropertyName);
+        }
 
         return property;
     }
@@ -183,10 +208,35 @@ public class MesFormula
 
         var nestedEditorType = NestedEditorTypes
             .FirstOrDefault(net => net.Number == keys.NestedEditorTypeNumber);
-        if (nestedEditorType == null) {
+        if (nestedEditorType == null)
+        {
             throw new ProgramException($"No Mes nested editor type found for [{keys.NestedEditorTypeNumber}]");
         }
 
         return nestedEditorType;
+    }
+
+    public void SetHasPersistedInsertedMesEvents(List<string> propertyNames)
+    {
+        var insertedEventPropertyNames = propertyNames
+            .Where(pn => MesProperty.IsInsertedMesEventPropertyName(pn))
+            .ToList();
+
+        foreach (var propertyName in insertedEventPropertyNames)
+        {
+            (var operationNumber, var phaseNumber, var stepNumber) = MesProperty.GetStagesForMesEventPropertyName(propertyName);
+            var keys = new MesFormulaEditKeys
+            {
+                OperationNumber = operationNumber,
+                PhaseNumber = phaseNumber,
+                StepNumber = stepNumber,
+                SubStepNumber = MesSubStep.InsertedMesEventSubStepNumber,
+            };
+            var mesSubStep = GetMesSubStep(keys);
+            if (mesSubStep != null)
+            {
+                mesSubStep.HasPersistedInsertedMesEvents = true;
+            }
+        }
     }
 }

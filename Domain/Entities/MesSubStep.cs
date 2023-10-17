@@ -2,6 +2,8 @@ namespace Domain.Entities;
 
 public class MesSubStep
 {
+	public const int InsertedMesEventSubStepNumber = 0;
+
 	public int Number { get; set; }
 	public string HierarchicalNumber { get; set; }
 	public MesFormulaEditKeys ParentEditKeys { get; set; }

@@ -59,6 +59,8 @@ public class MesProperty
       ReferenceNo != null
       && ReferenceNo.ToLower().Contains("showallevents=y");
 
+  public bool IsNestedEditorType => EditorType == MesEditorType.Nested;
+
   public static bool IsInsertedMesEventPropertyName(string propertyName)
   {
     return propertyName != null

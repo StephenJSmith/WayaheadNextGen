@@ -1,6 +1,7 @@
 namespace Domain.Entities;
 
-public class MesOperation {
+public class MesOperation
+{
 	public int Number { get; set; }
 	public MesFormulaEditKeys ParentEditKeys { get; set; }
 	public string Name { get; set; }
@@ -16,10 +17,11 @@ public class MesOperation {
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
 
-	public MesPhase FirstPhase => 
+	public MesPhase FirstPhase =>
 		Phases
 			.OrderBy(x => x.Number)
 			.FirstOrDefault();
+	public bool HasPersistedInsertedMesEvents => Phases.Any(ph => ph.HasPersistedInsertedMesEvents);
 
 	public MesPhase GetMesPhase(MesFormulaEditKeys keys)
 	{
@@ -29,16 +31,18 @@ public class MesOperation {
 		}
 
 		var phase = Phases.FirstOrDefault(ph => ph.Number == keys.PhaseNumber);
-		if (phase == null) {
+		if (phase == null)
+		{
 			throw new ProgramException($"Mes phase number [{keys.PhaseHierarchicalNumber}] cannot be found.");
 		}
 
 		return phase;
 	}
-	
+
 	public MesActionKeys ToMesActionKeys()
 	{
-		return new MesActionKeys {
+		return new MesActionKeys
+		{
 			OperationNumber = Number
 		};
 	}
