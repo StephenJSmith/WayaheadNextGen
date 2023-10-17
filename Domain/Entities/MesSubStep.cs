@@ -13,30 +13,42 @@ public class MesSubStep
 	public string PreRenderScript { get; set; }
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
-	public bool IsMesEvent => Properties != null 
+	public bool HasPersistedInsertedMesEvents { get; set; }
+
+	public bool IsMesEvent => Properties != null
 		&& Properties.Any(p => p.IsMesEvent);
 	public bool IsInsertedMesEvent => Properties != null
 		&& Properties.Any(p => p.IsInsertedMesEvent);
+	public bool IsShowAllEvents => Properties != null
+			&& Properties.Any(p => p.IsShowAllEvents);
 
-	public string SubStepHierarchicalNumber =>  $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{ParentEditKeys.StepNumber}.{Number}";
+	public string SubStepHierarchicalNumber => ParentEditKeys != null
+			? $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{ParentEditKeys.StepNumber}.{Number}"
+			: $"?.?.?.{Number}";
 
-	public MesProperty FirstProperty => 
+	public MesProperty FirstProperty =>
 		Properties
 			.OrderBy(pr => pr.PropertyNumber)
 			.FirstOrDefault();
 
-	public MesProperty GetMesProperty(MesFormulaEditKeys keys) {
+	public MesProperty GetMesProperty(MesFormulaEditKeys keys)
+	{
 		if (keys == null)
 		{
 			throw new ProgramException("Mes formula edit keys cannot be null.");
 		}
 
-		MesProperty property = null; 
-		if (keys.CanSearchProperty) {
+		MesProperty property = null;
+		if (keys.CanSearchProperty)
+		{
 			property = Properties.FirstOrDefault(prop => prop.Name == keys.PropertyName);
-		} else if (keys.CanSearchNestedPropertyChild) {
+		}
+		else if (keys.CanSearchNestedPropertyChild)
+		{
 			throw new NotImplementedException();
-		} else {
+		}
+		else
+		{
 			property = Properties.FirstOrDefault(prop => prop.Name == keys.NestedPropertyName);
 		}
 

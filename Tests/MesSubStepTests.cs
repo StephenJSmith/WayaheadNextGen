@@ -4,14 +4,15 @@ using Persistence.Repositories;
 
 namespace Tests;
 
-public class MesSubStepTests {
+public class MesSubStepTests
+{
   private const string TestPathFile = "901020.xml";
   private const string TestFormulaName = "901020";
   private const int TestEdition = 1;
   private const int TestRevision = 1;
-  private const string InsertedMesEventDescription =  "Event entry - Please enter any Events / Deviations / Comments in the table below.";
+  private const string InsertedMesEventDescription = "Event entry - Please enter any Events / Deviations / Comments in the table below.";
 
-  private MesSubStep GetSubjectUnderTest(int testOperationNumber, 
+  private MesSubStep GetSubjectUnderTest(int testOperationNumber,
     int testPhaseNumber, int testStepNumber, int testSubStepNumber)
   {
     var loader = new MesFormulaXmlLoader();
@@ -25,7 +26,8 @@ public class MesSubStepTests {
   private MesFormulaEditKeys GetEditKeysForSubStep(
     int operationNumber, int phaseNumber, int stepNumber, int subStepNumber)
   {
-    return new MesFormulaEditKeys {
+    return new MesFormulaEditKeys
+    {
       Formula = TestFormulaName,
       Edition = TestEdition,
       Revision = TestRevision,
@@ -37,10 +39,11 @@ public class MesSubStepTests {
   }
 
   private MesFormulaEditKeys GetEditKeysForProperty(
-    int operationNumber, int phaseNumber, int stepNumber, 
+    int operationNumber, int phaseNumber, int stepNumber,
     int subStepNumber, string propertyName)
   {
-    return new MesFormulaEditKeys {
+    return new MesFormulaEditKeys
+    {
       Formula = TestFormulaName,
       Edition = TestEdition,
       Revision = TestRevision,
@@ -58,8 +61,26 @@ public class MesSubStepTests {
   [InlineData(1, 1, 2, 1, "1.1.2.1")]
   [InlineData(4, 1, 2, 0, "4.1.2.0")]
   [InlineData(4, 1, 2, 3, "4.1.2.3")]
-  public void SubStepHierarchicalNumber(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expected) {
+  public void SubStepHierarchicalNumber(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expected)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
+
+    var actual = sut.SubStepHierarchicalNumber;
+
+    actual.Should().Be(expected);
+  }
+
+  [Fact]
+  public void SubStepHierarchicalNumber_WhenNoParentEditKeys_UseQuestionMarkForParentProperties()
+  {
+    var testOperationNumber = 4;
+    var testPhaseNumber = 1;
+    var testStepNumber = 2;
+    var testSubStepNumber = 3;
+
+    var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
+    sut.ParentEditKeys = null;
+    var expected = "?.?.?.3";
 
     var actual = sut.SubStepHierarchicalNumber;
 
@@ -69,8 +90,9 @@ public class MesSubStepTests {
   [Theory]
   [InlineData(1, 1, 1, 1, "RCV_Instructions", "Picking Instructions", "RichEditor")]
   [InlineData(1, 1, 1, 0, "$Event_1.1.1", "", "YesNo")]
-  [InlineData(7, 1, 2, 2, "TST_AverageRelativeDensity","Average Relative Density", "Decimal")]
-  public void FirstProperty(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expectedName, string expectedDescription, string expectedEditorType) {
+  [InlineData(7, 1, 2, 2, "TST_AverageRelativeDensity", "Average Relative Density", "Decimal")]
+  public void FirstProperty(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expectedName, string expectedDescription, string expectedEditorType)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
 
     var actual = sut.FirstProperty;
@@ -87,7 +109,8 @@ public class MesSubStepTests {
   [InlineData(5, 1, 5, 1, false)]
   [InlineData(8, 1, 1, 1, true)]
   [InlineData(9, 1, 1, 1, true)]
-  public void IsMesEvent(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, bool expected) { 
+  public void IsMesEvent(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, bool expected)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
 
     var actual = sut.IsMesEvent;
@@ -102,7 +125,8 @@ public class MesSubStepTests {
   [InlineData(5, 1, 5, 1, false)]
   [InlineData(8, 1, 1, 1, false)]
   [InlineData(9, 1, 1, 1, false)]
-  public void IsInsertedMesEvent(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, bool expected) { 
+  public void IsInsertedMesEvent(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, bool expected)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
 
     var actual = sut.IsInsertedMesEvent;
@@ -113,7 +137,8 @@ public class MesSubStepTests {
   [Theory]
   [InlineData(1, 1, 1, 0, "$Event_1.1.1")]
   [InlineData(5, 1, 5, 0, "$Event_5.1.5")]
-  public void InsertedMesEventSubStepDescriptionAndPropertyName(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expectedPropertyName) { 
+  public void InsertedMesEventSubStepDescriptionAndPropertyName(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string expectedPropertyName)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
     var expectedDescription = InsertedMesEventDescription;
 
@@ -127,8 +152,9 @@ public class MesSubStepTests {
   [Theory]
   [InlineData(1, 1, 1, 1, "RCV_Instructions", "Picking Instructions", "RichEditor")]
   [InlineData(1, 1, 1, 0, "$Event_1.1.1", "", "YesNo")]
-  [InlineData(7, 1, 2, 2, "TST_TotalNettWeight","Total Nett Weight", "Decimal")]
-  public void GetMesProperty(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string testPropertyName, string expectedDescription, string expectedEditorType) {
+  [InlineData(7, 1, 2, 2, "TST_TotalNettWeight", "Total Nett Weight", "Decimal")]
+  public void GetMesProperty(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, string testPropertyName, string expectedDescription, string expectedEditorType)
+  {
     var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
     var testEditKeys = GetEditKeysForProperty(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber, testPropertyName);
 
@@ -136,5 +162,19 @@ public class MesSubStepTests {
 
     actual.Description1.Should().Be(expectedDescription);
     actual.EditorType.ToString().Should().Be(expectedEditorType);
+  }
+
+  [Theory]
+  [InlineData(5, 1, 5, 0, false)]
+  [InlineData(5, 1, 5, 1, false)]
+  [InlineData(8, 1, 1, 1, false)]
+  [InlineData(9, 1, 1, 1, true)]
+  public void IsShowAllEvents_CreateRequiredMesEventSubSteps(int testOperationNumber, int testPhaseNumber, int testStepNumber, int testSubStepNumber, bool expected)
+  {
+    var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber, testSubStepNumber);
+
+    var actual = sut.IsShowAllEvents;
+
+    actual.Should().Be(expected);
   }
 }
