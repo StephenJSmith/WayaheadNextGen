@@ -27,7 +27,7 @@ public class MesStep
 	public string PreRenderScript { get; set; }
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
-	public bool HasPersistedInsertedMesEvents => SubSteps.Any(sub => sub.HasPersistedInsertedMesEvents);
+	public bool HasPersistedInsertedMesEvents { get; set; }
 	public bool HasInsertedMesEventSubStep =>
 		SubSteps != null && SubSteps.Any(sub => sub.IsInsertedMesEvent);
 	public int MesEventSubStepNumber => HasInsertedMesEventSubStep
@@ -37,6 +37,26 @@ public class MesStep
 	public string StepHierarchicalNumber => ParentEditKeys != null
 			? $"{ParentEditKeys.OperationNumber}.{ParentEditKeys.PhaseNumber}.{Number}"
 			: $"?.?.{Number}";
+
+	public List<int> GetParsedNewRunLinkedSteps()
+	{
+		if (string.IsNullOrWhiteSpace(NewRunLinkedSteps))
+		{
+			return new List<int>();
+		}
+
+		var result = new List<int>();
+		var steps = NewRunLinkedSteps.Split(',').ToList();
+		foreach (var item in steps)
+		{
+			if (int.TryParse(item, out int stepNumber))
+			{
+				result.Add(stepNumber);
+			}
+		}
+
+		return result;
+	}
 
 	public MesSubStep GetMesSubStep(MesFormulaEditKeys keys)
 	{
@@ -105,6 +125,17 @@ public class MesStep
 		};
 
 		return mesSubStep;
+	}
+
+	public void SetHasPersistedMesEvents()
+	{
+		HasPersistedInsertedMesEvents = true;
+
+		var insertedMesSubStep = SubSteps.FirstOrDefault(sub => sub.IsInsertedMesEvent);
+		if (insertedMesSubStep != null)
+		{
+			insertedMesSubStep.HasPersistedInsertedMesEvents = true;
+		}
 	}
 
 	public MesActionKeys ToMesActionKeys()

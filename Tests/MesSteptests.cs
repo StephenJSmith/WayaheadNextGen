@@ -1,3 +1,4 @@
+using System.Configuration;
 using Domain.Entities;
 using FluentAssertions;
 using Persistence.Repositories;
@@ -53,16 +54,22 @@ public class MesStepTests
   }
 
   [Theory]
-  [InlineData(1, 1, 1, "1.1.1")]
-  [InlineData(5, 1, 4, "5.1.4")]
-  [InlineData(8, 2, 1, "8.2.1")]
-  public void StepHierarchicalNumber(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expected)
-  {
-    var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber);
+  [InlineData("", new int[]{})]
+  [InlineData(null, new int[]{})]
+  [InlineData("   ", new int[]{})]
+  [InlineData("no steps", new int[]{})]
+  [InlineData("2", new int[]{2})]
+  [InlineData("1,3,5", new int[]{1,3,5})]
+  [InlineData("1,two,3,four,5", new int[]{1,3,5})]
+  
+  public void GetParsedNewRunLinkedSteps(string testNewRunLinkedSteps, int[] expected) {
+    var sut = new MesStep {
+      NewRunLinkedSteps = testNewRunLinkedSteps,
+    };
 
-    var actual = sut.StepHierarchicalNumber;
+    var actual = sut.GetParsedNewRunLinkedSteps();
 
-    actual.Should().Be(expected);
+    actual.Should().BeEquivalentTo(expected);
   }
 
   [Fact]
@@ -126,5 +133,18 @@ public class MesStepTests
     var actual = sut.GetMesSubStep(testEditKeys);
 
     actual.Description1.Should().Be(expectedSubStepDescription);
+  }
+
+  [Theory]
+  [InlineData(1, 1, 1, "1.1.1")]
+  [InlineData(5, 1, 4, "5.1.4")]
+  [InlineData(8, 2, 1, "8.2.1")]
+  public void StepHierarchicalNumber(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expected)
+  {
+    var sut = GetSubjectUnderTest(testOperationNumber, testPhaseNumber, testStepNumber);
+
+    var actual = sut.StepHierarchicalNumber;
+
+    actual.Should().Be(expected);
   }
 }

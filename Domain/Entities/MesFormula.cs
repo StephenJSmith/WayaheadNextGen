@@ -230,12 +230,11 @@ public class MesFormula
                 OperationNumber = operationNumber,
                 PhaseNumber = phaseNumber,
                 StepNumber = stepNumber,
-                SubStepNumber = MesSubStep.InsertedMesEventSubStepNumber,
             };
-            var mesSubStep = GetMesSubStep(keys);
-            if (mesSubStep != null)
+            var mesStep = GetMesStep(keys);
+            if (mesStep != null)
             {
-                mesSubStep.HasPersistedInsertedMesEvents = true;
+                mesStep.HasPersistedInsertedMesEvents = true;
             }
         }
     }
