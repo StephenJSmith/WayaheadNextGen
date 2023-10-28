@@ -22,6 +22,7 @@ public class MesOperation
 			.OrderBy(x => x.Number)
 			.FirstOrDefault();
 	public bool HasPersistedInsertedMesEvents => Phases.Any(ph => ph.HasPersistedInsertedMesEvents);
+	public bool IsFinished => Phases.All(st => st.IsFinished);
 
 	public MesPhase GetMesPhase(MesFormulaEditKeys keys)
 	{

@@ -265,7 +265,7 @@ public class MesFormulaTests
   [Theory]
   [InlineData(1, 1, 1, "Picking Instructions")]
   [InlineData(7, 2, 3, "Packing")]
-  public void GetMesStep(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expectedStepDescription)
+  public void GetMesStep_FormulaEditKeys(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expectedStepDescription)
   {
     var sut = GetSubjectUnderTest();
     var testEditKeys = GetEditKeysForStep(testOperationNumber, testPhaseNumber, testStepNumber);
@@ -273,6 +273,24 @@ public class MesFormulaTests
     var actual = sut.GetMesStep(testEditKeys);
 
     actual.Description1.Should().Be(expectedStepDescription);
+    actual.OperationNumber.Should().Be(testOperationNumber);
+    actual.PhaseNumber.Should().Be(testPhaseNumber);
+    actual.Number.Should().Be(testStepNumber);
+  }
+
+  [Theory]
+  [InlineData(1, 1, 1, "Picking Instructions")]
+  [InlineData(7, 2, 3, "Packing")]
+  public void GetMesStep_OperationPhaseStep(int testOperationNumber, int testPhaseNumber, int testStepNumber, string expectedStepDescription)
+  {
+    var sut = GetSubjectUnderTest();
+
+    var actual = sut.GetMesStep(testOperationNumber, testPhaseNumber, testStepNumber);
+
+    actual.Description1.Should().Be(expectedStepDescription);
+    actual.OperationNumber.Should().Be(testOperationNumber);
+    actual.PhaseNumber.Should().Be(testPhaseNumber);
+    actual.Number.Should().Be(testStepNumber);
   }
 
   [Theory]
@@ -441,4 +459,202 @@ public class MesFormulaTests
     actualOperation1.Should().BeTrue();
     actualOperation2.Should().BeTrue();
   }
+
+  [Fact]
+  public void SetIsFinishedSteps_WhenASingleStepIsSetFinished_ThenStepIsFinished()
+  {
+    var sut = GetSubjectUnderTest();
+    var testOperationNumber = 2;
+    var testPhaseNumber =  1;
+    var testStepNumber = 1;
+    var testMesResult = new MesResult {
+      OperationNumber = testOperationNumber,
+      PhaseNumber = testPhaseNumber,
+      StepNumber = testStepNumber,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testMesResults = new List<MesResult> { testMesResult };
+    var initial = sut.GetMesStep(testOperationNumber, testPhaseNumber, testStepNumber);
+    initial.IsFinished.Should().BeFalse();
+
+    sut.SetIsFinishedSteps(testMesResults);
+
+    var actual = sut.GetMesStep(testOperationNumber, testPhaseNumber, testStepNumber);
+    actual.IsFinished.Should().BeTrue();
+  }
+
+  [Fact]
+  public void SetIsFinishedSteps_WhenAllStepsInAPhaseFinished_ThenPhaseIsFinished()
+  {
+    var sut = GetSubjectUnderTest();
+    var testOperationNumber = 2;
+    var testPhaseNumber =  1;
+    var testStepNumber = 1;
+    var testMesResult = new MesResult {
+      OperationNumber = testOperationNumber,
+      PhaseNumber = testPhaseNumber,
+      StepNumber = testStepNumber,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testOperationNumber2 = 2;
+    var testPhaseNumber2 = 1;
+    var testStepNumber2 = 2;
+    var testMesResult2 = new MesResult {
+      OperationNumber = testOperationNumber2,
+      PhaseNumber = testPhaseNumber2,
+      StepNumber = testStepNumber2,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testMesResults = new List<MesResult> { testMesResult, testMesResult2 };
+    var initial = sut.GetMesPhase(testOperationNumber, testPhaseNumber);
+    initial.IsFinished.Should().BeFalse();
+
+    sut.SetIsFinishedSteps(testMesResults);
+
+    var actual = sut.GetMesPhase(testOperationNumber, testPhaseNumber);
+    actual.IsFinished.Should().BeTrue();
+  }
+
+  [Fact]
+  public void SetIsFinishedSteps_WhenNOTAllStepsInAPhaseFinished_ThenPhaseIsNOTFinished()
+  {
+    var sut = GetSubjectUnderTest();
+    var testOperationNumber = 5;
+    var testPhaseNumber =  1;
+    var testStepNumber = 1;
+    var testMesResult = new MesResult {
+      OperationNumber = testOperationNumber,
+      PhaseNumber = testPhaseNumber,
+      StepNumber = testStepNumber,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testOperationNumber2 = 5;
+    var testPhaseNumber2 = 1;
+    var testStepNumber2 = 2;
+    var testMesResult2 = new MesResult {
+      OperationNumber = testOperationNumber2,
+      PhaseNumber = testPhaseNumber2,
+      StepNumber = testStepNumber2,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testMesResults = new List<MesResult> { testMesResult, testMesResult2 };
+    var initial = sut.GetMesPhase(testOperationNumber, testPhaseNumber);
+    initial.IsFinished.Should().BeFalse();
+
+    sut.SetIsFinishedSteps(testMesResults);
+
+    var actual = sut.GetMesPhase(testOperationNumber, testPhaseNumber);
+    actual.IsFinished.Should().BeFalse();
+  }
+
+  [Fact]
+  public void SetIsFinishedSteps_WhenAllStepsInAnOperationFinished_ThenOperationIsFinished()
+  {
+    var sut = GetSubjectUnderTest();
+    var testOperationNumber = 4;
+    var testPhaseNumber =  1;
+    var testStepNumber = 1;
+    var testMesResult = new MesResult {
+      OperationNumber = testOperationNumber,
+      PhaseNumber = testPhaseNumber,
+      StepNumber = testStepNumber,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testOperationNumber2 = 4;
+    var testPhaseNumber2 = 1;
+    var testStepNumber2 = 2;
+    var testMesResult2 = new MesResult {
+      OperationNumber = testOperationNumber2,
+      PhaseNumber = testPhaseNumber2,
+      StepNumber = testStepNumber2,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testMesResults = new List<MesResult> { testMesResult, testMesResult2 };
+    var initial = sut.GetMesOperation(testOperationNumber);
+    initial.IsFinished.Should().BeFalse();
+
+    sut.SetIsFinishedSteps(testMesResults);
+
+    var actual = sut.GetMesOperation(testOperationNumber);
+    actual.IsFinished.Should().BeTrue();
+  }
+
+  [Fact]
+  public void SetIsFinishedSteps_WhenNOTAllStepsInAnOperationFinished_ThenOperationIsNOTFinished()
+  {
+    var sut = GetSubjectUnderTest();
+    var testOperationNumber = 7;
+    var testPhaseNumber =  1;
+    var testStepNumber = 1;
+    var testMesResult = new MesResult {
+      OperationNumber = testOperationNumber,
+      PhaseNumber = testPhaseNumber,
+      StepNumber = testStepNumber,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testOperationNumber2 = 7;
+    var testPhaseNumber2 = 1;
+    var testStepNumber2 = 2;
+    var testMesResult2 = new MesResult {
+      OperationNumber = testOperationNumber2,
+      PhaseNumber = testPhaseNumber2,
+      StepNumber = testStepNumber2,
+      PropertyName = MesActionKeys.FinishedStepPropertyName,
+    };
+    var testMesResults = new List<MesResult> { testMesResult, testMesResult2 };
+    var initial = sut.GetMesOperation(testOperationNumber);
+    initial.IsFinished.Should().BeFalse();
+
+    sut.SetIsFinishedSteps(testMesResults);
+
+    var actual = sut.GetMesOperation(testOperationNumber);
+    actual.IsFinished.Should().BeFalse();
+  }
+
+  [Fact]
+  public void SetIsFinishedSteps_WhenAllStepsFinished_ThenBatchIsFinished()
+  {
+    var sut = GetSubjectUnderTest();
+    var testFinishedSteps = new List<string> {
+      "1.1.1", "1.1.2", 
+      "2.1.1", "2.1.2", 
+      "3.1.1", "3.1.2", "3.1.3", 
+      "4.1.1", "4.1.2",
+      "5.1.1", "5.1.2", "5.1.3", "5.1.4", "5.1.5",
+      "6.1.1", "6.1.2", "6.1.3", "6.1.4",
+      "7.1.1", "7.1.2", "7.2.1", "7.2.2", "7.2.3",
+      "8.1.1", "8.2.1",
+      "9.1.1", "9.1.2"
+      };
+
+    var testMesResResults = GetMesResults(testFinishedSteps);
+
+    sut.SetIsFinishedSteps(testMesResResults);
+
+    sut.IsFinished.Should().BeTrue();
+  }
+
+    private List<MesResult> GetMesResults(List<string> finishedSteps)
+    {
+        var results = new List<MesResult>();
+
+        foreach (var item in finishedSteps)
+        {
+          results.Add(GetMesResult(item));
+        }
+
+        return results;
+    }
+
+    private MesResult GetMesResult(string stepHierarchicalNumber)
+    {
+      var elements = stepHierarchicalNumber.Split('.');
+
+      return new MesResult {
+        OperationNumber = int.Parse(elements[0]),
+        PhaseNumber = int.Parse(elements[1]),
+        StepNumber = int.Parse(elements[2]),
+        PropertyName = MesActionKeys.FinishedStepPropertyName
+      };
+    }
 }

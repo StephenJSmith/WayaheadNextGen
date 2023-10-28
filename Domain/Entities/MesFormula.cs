@@ -18,6 +18,7 @@ public class MesFormula
         ? Description1
         : $"{Description1} / {Description2}";
     public string FormulaName => $"{Name}/{Edition}.{Revision}";
+	public bool IsFinished => Operations.All(st => st.IsFinished);
 
     public bool HasOperation(int operationNumber)
     {
@@ -70,6 +71,16 @@ public class MesFormula
         return phase;
     }
 
+    public MesPhase GetMesPhase(int operationNumber, int phaseNumber)
+    {
+        var keys = new MesFormulaEditKeys {
+            OperationNumber = operationNumber,
+            PhaseNumber = phaseNumber
+        };
+
+        return GetMesPhase(keys);
+    }
+
     public bool IsFirstPhase(int operationNumber, int phaseNumber)
     {
         var operation = GetMesOperation(operationNumber);
@@ -106,6 +117,17 @@ public class MesFormula
         var step = phase.GetMesStep(keys);
 
         return step;
+    }
+
+    public MesStep GetMesStep(int operationNumber, int phaseNumber, int stepNumber)
+    {
+        var keys = new MesFormulaEditKeys {
+            OperationNumber = operationNumber,
+            PhaseNumber = phaseNumber,
+            StepNumber = stepNumber
+        };
+
+        return GetMesStep(keys);
     }
 
     public IList<MesStep> GetMesStepAndPreviousSteps(MesActionKeys actionKeys)
@@ -234,7 +256,29 @@ public class MesFormula
             var mesStep = GetMesStep(keys);
             if (mesStep != null)
             {
-                mesStep.HasPersistedInsertedMesEvents = true;
+                mesStep.SetHasPersistedMesEvents();
+            }
+        }
+    }
+
+    public void SetIsFinishedSteps(List<MesResult> mesResults)
+    {
+        var finishedSteps = mesResults
+            .Where(x => MesActionKeys.IsFinishedStepPropertyName(x.PropertyName))
+            .ToList();
+
+        foreach (var item in finishedSteps)
+        {
+            var keys = new MesFormulaEditKeys {
+                OperationNumber = item.OperationNumber,
+                PhaseNumber = item.PhaseNumber,
+                StepNumber = item.StepNumber
+            };
+
+            var mesStep = GetMesStep(keys);
+            if (mesStep != null)
+            {
+                mesStep.IsFinished = true;
             }
         }
     }

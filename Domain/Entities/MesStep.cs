@@ -28,6 +28,7 @@ public class MesStep
 	public string PostExecutionScript { get; set; }
 	public string ReferenceNo { get; set; }
 	public bool HasPersistedInsertedMesEvents { get; set; }
+	public bool IsFinished { get; set;	}
 	public bool HasInsertedMesEventSubStep =>
 		SubSteps != null && SubSteps.Any(sub => sub.IsInsertedMesEvent);
 	public int MesEventSubStepNumber => HasInsertedMesEventSubStep

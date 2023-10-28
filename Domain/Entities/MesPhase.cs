@@ -23,6 +23,7 @@ public class MesPhase
 			? $"{ParentEditKeys.OperationNumber}.{Number}"
 			: $"?.{Number}";
 	public bool HasPersistedInsertedMesEvents => Steps.Any(st => st.HasPersistedInsertedMesEvents);
+	public bool IsFinished => Steps.All(st => st.IsFinished);
 
 	public MesStep GetMesStep(MesFormulaEditKeys keys)
 	{

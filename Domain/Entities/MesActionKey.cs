@@ -2,6 +2,8 @@ namespace Domain.Entities;
 
 public class MesActionKeys
 {
+  public const string FinishedStepPropertyName = "Finished";
+
   public string Batch { get; set; }
   public string LinkedBatch { get; set; }
   public string Formula { get; set; }
@@ -27,5 +29,9 @@ public class MesActionKeys
   public string SubStepHierarchicalNumber => $"{OperationNumber}.{PhaseNumber}.{StepNumber}.{SubStepNumber}";
 
   public bool IsInitialMesPageLoad => string.IsNullOrWhiteSpace(Batch);
+
+  public static bool IsFinishedStepPropertyName(string propertyName) {
+    return propertyName.Equals(propertyName, StringComparison.OrdinalIgnoreCase);
+  }
 
 }
