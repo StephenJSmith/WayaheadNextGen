@@ -1,5 +1,6 @@
 using System.Xml;
 using System.Xml.Linq;
+using FluentAssertions;
 using Newtonsoft.Json;
 using Persistence.Repositories;
 
@@ -40,9 +41,29 @@ public class SiteMapLoaderTests
   public void ConvertToJsonViaXElement()
   {
     var xElement = XElement.Load(TestPathFile);
-    xElement.
-    var xmlNode = GetXmlNode(xElement));
+    var xmlNode = GetXmlNode(xElement);
     var actual = JsonConvert.SerializeXmlNode(xmlNode);
+  }
+
+  [Fact]
+  public void GetNextAvailableChildBatchSeq()
+  {
+    var batches = new List<string> {
+      "A1234-2_3",
+      "A1234-2_2",
+      "A1234-2_1",
+      "A1234-2_6",
+      "A1234-2_5",
+      "A1234-2_4",
+    };
+    var expected = 7;
+
+    var maxNumber = batches
+      .Select(x => Convert.ToInt32(x.Substring(x.LastIndexOf('_')+1)))
+      .Max();
+    var actual = maxNumber + 1;
+
+    actual.Should().Be(expected);
   }
 
   private XmlNode GetXmlNode(XElement xElement)
