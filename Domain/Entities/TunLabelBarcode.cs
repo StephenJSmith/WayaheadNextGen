@@ -15,18 +15,21 @@ public class TunLabelBarcode
 
   public bool IsBarcodeScanned => Barcode.Length == BarcodeLength;
 
-  public string BarcodeExpiryDateString 
+  public string BarcodeExpiryDateString
   {
-    get {
+    get
+    {
       if (!IsBarcodeScanned) return string.Empty;
 
       return Barcode.Substring(BarcodeDateIndex, DateFormat.Length);
     }
   }
 
-  public DateTime BarcodeExpiryDate {
-    get {
-      var yy = BarcodeExpiryDateString.Substring(0,2);
+  public DateTime BarcodeExpiryDate
+  {
+    get
+    {
+      var yy = BarcodeExpiryDateString.Substring(0, 2);
       var mm = BarcodeExpiryDateString.Substring(2, 2);
       var dd = BarcodeExpiryDateString.Substring(4, 2);
       var year = 2000 + int.Parse(yy);
@@ -37,18 +40,26 @@ public class TunLabelBarcode
     }
   }
 
-  public string BarcodeParentBatchNumber 
+  public string BarcodeParentBatchNumber
   {
-    get {
-      if (!IsBarcodeScanned) return string.Empty;
+    get
+    {
+      if (!IsBarcodeScanned
+        || Barcode.Length < BarcodeParentBatchIndex + ParentBatchNumberLength)
+      {
+        return string.Empty;
+      }
 
-      return Barcode.Substring(BarcodeParentBatchIndex, DateFormat.Length);
+      return Barcode.Substring(BarcodeParentBatchIndex, ParentBatchNumberLength);
     }
   }
 
-  public string ParentBatchNumber {
-    get {
-      if (string.IsNullOrWhiteSpace(BatchNumber)) {
+  public string ParentBatchNumber
+  {
+    get
+    {
+      if (string.IsNullOrWhiteSpace(BatchNumber))
+      {
         return string.Empty;
       }
 
@@ -68,9 +79,10 @@ public class TunLabelBarcode
     CurrentDate = currentDate;
   }
 
-  public void ScanBarcode(string barcode) 
+  public void ScanBarcode(string barcode)
   {
-    if (barcode == null || barcode.Trim().Length != BarcodeLength) {
+    if (barcode == null || barcode.Trim().Length != BarcodeLength)
+    {
       throw new InvalidDataException("Invalid barcode");
     }
 
