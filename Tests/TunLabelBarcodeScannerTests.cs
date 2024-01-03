@@ -110,7 +110,7 @@ public class TunLabelBarcodeScannerTests
   {
     var sut = TunLabelBarcodeScanner.Scan(testBarcode, TestBatchNumber, TestDispensedDate, TestShelfLifeDays);
 
-    var actual = sut.IsValidUseByDate;
+    var actual = sut.IsValidParentBatchNumber;
 
     actual.Should().Be(expected);
   }
