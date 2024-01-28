@@ -161,6 +161,7 @@ public class MesFormulaTests
   [Theory]
   [InlineData("HERBAL REVIVAL FACE CREAM", "", "HERBAL REVIVAL FACE CREAM")]
   [InlineData("HERBAL REVIVAL FACE CREAM", "SUMMER EDITION", "HERBAL REVIVAL FACE CREAM / SUMMER EDITION")]
+  [InlineData("", "ALL YEAR ROUND", "ALL YEAR ROUND")]
   public void Description(string description1, string description2, string expected)
   {
     var sut = new MesFormula

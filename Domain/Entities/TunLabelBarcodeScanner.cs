@@ -54,7 +54,6 @@ public class TunLabelBarcodeScanner
       var length = Math.Min(ParentBatchNumberLength, BatchNumber.Length);
 
       return BatchNumber[..length];
-
     }
   }
   public bool IsValidUseByDate => 
@@ -86,5 +85,9 @@ public class TunLabelBarcodeScanner
       batchNumber, 
       dispensedDate, 
       shelfLifeDays);
+  }
+
+  public static string GetCompressionBatchNumber(string coatingBatchNumber) {
+    return coatingBatchNumber.Replace("-2", "-3");
   }
 }

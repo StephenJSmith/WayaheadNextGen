@@ -14,9 +14,16 @@ public class MesFormula
     public DateTime SavedOn { get; set; }
     public string SavedBy { get; set; }
 
-    public string Description => string.IsNullOrWhiteSpace(Description2)
-        ? Description1
-        : $"{Description1} / {Description2}";
+    public string Description {
+        get {
+            var isDesc1 = !string.IsNullOrWhiteSpace(Description1);
+            var isDesc2 = !string.IsNullOrWhiteSpace(Description2);
+            if (isDesc1 && isDesc2) return $"{Description1} / {Description2}";
+            if (isDesc2) return Description2;
+
+            return Description1;
+        }
+    }
     public string FormulaName => $"{Name}/{Edition}.{Revision}";
 	public bool IsFinished => Operations.All(st => st.IsFinished);
 

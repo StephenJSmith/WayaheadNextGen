@@ -115,6 +115,18 @@ public class TunLabelBarcodeScannerTests
     actual.Should().Be(expected);
   }
 
+  [Theory]
+  [InlineData("A1234-2_1", "A1234-3_1")]
+  [InlineData("A1234-2_13", "A1234-3_13")]
+  [InlineData("K3489-2_2", "K3489-3_2")]
+  [InlineData("J8029-2", "J8029-3")]
+  public void GetCompressionBatchNumber(string testBatchNumber, string expected)
+  {
+    var actual = TunLabelBarcodeScanner.GetCompressionBatchNumber(testBatchNumber);
+
+    actual.Should().Be(expected);
+  }
+
   private string GetBarcode(string formattedDate, string parentBatchNumber)
   {
     return $"010930080735468117{formattedDate}10{parentBatchNumber}";
