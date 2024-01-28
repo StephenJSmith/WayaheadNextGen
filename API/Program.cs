@@ -1,9 +1,24 @@
+using Application.Formula;
+using Persistence.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(opt => 
+{
+      opt.AddPolicy("CorsPolicy", policy =>
+      {
+        policy
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          .AllowAnyOrigin();
+      });
+});
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DetailsHandler.Handler).Assembly));
+builder.Services.AddScoped<IFormulaStepsRepository, FormulaStepsRepository>();
 
 var app = builder.Build();
 
@@ -35,6 +50,8 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+app.UseCors("CorsPolicy");
 
 app.Run();
 
