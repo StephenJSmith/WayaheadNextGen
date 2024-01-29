@@ -7,13 +7,13 @@ namespace Application.Formula;
 
 public class DetailsHandler
 {
-    private const string TestPathFile =  "901020.xml";
-    private const string TestFormulaName = "901020";
-    private const int TestEdition = 1;
-    private const int TestRevision = 1;
-
   public class Query : IRequest<Result<MesFormula>>
-  { }
+  { 
+    public string PathFile { get; set; }
+    public string FormulaName { get; set; }
+    public int Edition { get; set; }
+    public int Revision { get; set; }
+  }
 
   public class Handler : IRequestHandler<Query, Result<MesFormula>>
   {
@@ -26,7 +26,10 @@ public class DetailsHandler
     public async Task<Result<MesFormula>> Handle(Query request, CancellationToken cancellationToken)
     {
       var mesFormula = await _repository.GetFormulaStepsWithEventSubStepAsync(
-        TestFormulaName, TestEdition, TestRevision, TestPathFile);
+        request.FormulaName, 
+        request.Edition,
+        request.Revision,
+        request.PathFile);
 
       return Result<MesFormula>.Success(mesFormula);
     }
