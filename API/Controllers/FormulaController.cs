@@ -5,7 +5,8 @@ namespace API.Controllers;
 
 public class FormulaController : BaseApiController
 {
-    private const string TestPathFile =  @"d:\_projects\Wayahead\WayaheadNextGen\Formulae/901020.xml";
+    // private const string TestPathFile =  @"d:\_projects\Wayahead\WayaheadNextGen\Formulae/901020.xml";
+    private const string TestPathFile =  @"/Users/macmini/Documents/_projects/Wayahead/WayaheadNextGen/Formulae/901020.xml";
     private const string TestFormulaName = "901020";
     private const int TestEdition = 1;
     private const int TestRevision = 1;
